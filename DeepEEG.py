@@ -4,24 +4,33 @@ import theano
 import lasagne
 import theano.tensor as T
 
-#inputMat = sio.loadmat('covertShiftsOfAttention_VPiac.mat')
-inputMat = sio.loadmat('eeglab_data.set') #data is stored under inputMat['EEG']
+dataPath = '/home/rfratila/Desktop/MENTALdata/'
+inputMat = sio.loadmat('%scovertShiftsOfAttention_VPiac.mat'%dataPath)
+#inputMat = sio.loadmat('eeglab_data.set') #data is stored under inputMat['EEG']
 
-import pudb; pu.db
+trainOut = numpy.array([[1,0]])
+
 input_var = T.tensor4('input')
 y = T.dmatrix('truth')
 
-network = lasagne.layers.InputLayer(shape=(None, 1, None, None),input_var=input_var)
+data = numpy.array(inputMat['data']['X'][0][0][:10000], dtype='float32') #of size (657660, 62)
+channels = 62
+dimensions = (1,1,data.shape[0],data.shape[1]) #We have to specify the input size because of the dense layer
+
+network = lasagne.layers.InputLayer(shape=dimensions,input_var=input_var)
 #These are the hidden layers mostly for demonstration purposes
-network = lasagne.layers.DenseLayer(network, num_units=200, nonlinearity=lasagne.nonlinearities.rectify)
-network = lasagne.layers.DenseLayer(network, num_units=200, nonlinearity=lasagne.nonlinearities.rectify)
-#network = lasagne.layers.Conv2DLayer(network, num_filters=2, filter_size=(5,5), nonlinearity=lasagne.nonlinearities.rectify)
+#network = lasagne.layers.DenseLayer(network, num_units=200, nonlinearity=lasagne.nonlinearities.rectify)
+#network = lasagne.layers.DenseLayer(network, num_units=200, nonlinearity=lasagne.nonlinearities.rectify)
+network = lasagne.layers.Conv2DLayer(network, num_filters=10, filter_size=(5,5), nonlinearity=lasagne.nonlinearities.rectify)
 network = lasagne.layers.DenseLayer(network, num_units=2, nonlinearity = lasagne.nonlinearities.softmax)
 
 #Trying to figure out how to extract the frequencies and time from the data
-test = numpy.asarray([1,1] + list(inputMat['EEG']))
+trainIn = data.reshape([1,1] + list(data.shape))
 out = lasagne.layers.get_output(network)
 view_fn = theano.function([input_var], out)
+testInput = view_fn(trainIn)
+print testInput
+#import pudb; pu.db
 
 #---------------------------------For training------------------------------------------
 
@@ -36,15 +45,21 @@ updates = lasagne.updates.adam(cost, params, learning_rate=0.001, beta1=0.9, bet
 
 #theano function to compare brain to their masks with ADAM optimization
 train_function = theano.function([input_var, y], updates=updates) # omitted (, allow_input_downcast=True)
-val_fn = theano.function([input_var, y], [test_loss, test_acc])	 #check for error and accuracy percentage
 
+#We will use this for validation
+testPrediction = lasagne.layers.get_output(network, deterministic=True)			#create prediction
+testLoss = lasagne.objectives.categorical_crossentropy(testPrediction,y).mean()   #check how much error in prediction
+testAcc = T.mean(T.eq(T.argmax(testPrediction, axis=1), T.argmax(y, axis=1)),dtype=theano.config.floatX)	#check the accuracy of the prediction
 
-test_prediction = lasagne.layers.get_output(network, deterministic=True)			#create prediction
-test_loss = lasagne.objectives.categorical_crossentropy(test_prediction,y).mean()   #check how much error in prediction
-test_acc = T.mean(T.eq(T.argmax(test_prediction, axis=1), T.argmax(y, axis=1)),dtype=theano.config.floatX)	#check the accuracy of the prediction
+validateFn = theano.function([input_var, y], [testLoss, testAcc])	 #check for error and accuracy percentage
 
-train_function(trainIn, trainOut)
+for i in xrange(5):
+
+	train_function(trainIn, trainOut)
 	
-error, accuracy = val_fn(trainIn, trainOut) 			     #pass modified data through network
+	error, accuracy = validateFn(trainIn, trainOut) 			     #pass modified data through network
 
-print "error: ",error,"and accuracy: ", accuracy
+	print "error: ",error,"and accuracy: ", accuracy
+
+testInput = view_fn(trainIn)
+print testInput
