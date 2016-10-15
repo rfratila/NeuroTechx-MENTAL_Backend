@@ -45,6 +45,6 @@ test_acc = T.mean(T.eq(T.argmax(test_prediction, axis=1), T.argmax(y, axis=1)),d
 
 train_function(trainIn, trainOut)
 	
-error, accuracy = val_fn(trainIn, trainOut) 			     #pass modified img through network
+error, accuracy = val_fn(trainIn, trainOut) 			     #pass modified data through network
 
 print "error: ",error,"and accuracy: ", accuracy
