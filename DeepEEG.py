@@ -5,10 +5,10 @@ import lasagne
 import theano.tensor as T
 
 dataPath = '/home/rfratila/Desktop/MENTALdata/'
-inputMat = sio.loadmat('%scovertShiftsOfAttention_VPiac.mat'%dataPath)
+inputMat = sio.loadmat('%scovertShiftsOfAttention_VPiac.mat'%dataPath)# got this from: http://bnci-horizon-2020.eu/database/data-sets
 #inputMat = sio.loadmat('eeglab_data.set') #data is stored under inputMat['EEG']
 
-trainOut = numpy.array([[1,0]])
+trainOut = numpy.array([[1,0]]) #this will contain the actual state of the brain
 
 input_var = T.tensor4('input')
 y = T.dmatrix('truth')
