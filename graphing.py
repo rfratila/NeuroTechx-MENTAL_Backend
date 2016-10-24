@@ -6,14 +6,20 @@ import numpy as np
 import datetime 
 import time
 import random
+import json
 
 streams = []
 traces = []
 stream_links = []
 end_value = False
 
-def initialize(username, api_key, stream_ids=[]):
-    tls.set_credentials_file(username=username, api_key=api_key, stream_ids=stream_ids)
+def key_fetcher():
+    with open('api_keys.json') as infile:
+        return json.load(infile)
+
+def initialize(username="", api_key="", stream_ids=[]):
+    creds = key_fetcher()
+    tls.set_credentials_file(username=creds['username'], api_key=creds['api_key'], stream_ids=creds['tokens'])
 
 def setup_streams(number, maxpoints):
     stream_ids = tls.get_credentials_file()['stream_ids']
@@ -49,7 +55,8 @@ def process(number, inputs,delay):
     time.sleep(delay)
 
 def test():
-    initialize('harrycomp16','lz32gpppdp',['0o6vesm7a8','n3zaejpu6t','7e52rorz0h'])
+    # used to run tests without an actual openbci plugged in
+    initialize()
     setup_streams(3,80)
     setup_traces(3)
     setup_plot('Time-Series','python-streaming')
@@ -72,7 +79,7 @@ def test():
         stream_links[i].close()
 
 def testrun():
-    initialize('harrycomp16','lz32gpppdp',['0o6vesm7a8','n3zaejpu6t','7e52rorz0h'])
+    initialize()
     setup_streams(3,80)
     setup_traces(3)
     setup_plot('Time-Series','python-streaming')
