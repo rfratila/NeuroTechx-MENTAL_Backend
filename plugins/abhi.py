@@ -80,7 +80,7 @@ class PluginAbhi(plugintypes.IPluginExtended):
         channel_values = res[2:11]
         aux_values = res[11:14]
         # self.live_graph(channel_values[0])
-        res_json = {"timestamp" : timestamp, "sample_number" : sample_number, "channel_values" : channel_values, "aux_values" : aux_values}
+        res_json = {"timestamp" : timestamp, "sample_number" : sample_number, "channel_values" : channel_values, "aux_values" : aux_values, "delay" : 0.1}
         r = requests.post(self.url+'data', data=res_json)
         # pprint('person name is ' + self.person)
 

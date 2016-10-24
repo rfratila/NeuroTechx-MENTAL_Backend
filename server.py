@@ -16,7 +16,11 @@ def start():
 def data():
     x = request.form['timestamp']
     ys = request.form['channel_values']
-    process(3, [{'x':x, 'y' : ys[0]},{'x' : x, 'y': ys[1]},{'x' : x, 'y': ys[2]}], 0.1)
+    delay = request.form['delay']
+    li = []
+    for y in ys:
+        li.append({"x" : x, 'y' : y})
+    process(3, li, delay)
     return ""
 
 @app.route('/end')
