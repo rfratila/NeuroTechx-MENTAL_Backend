@@ -35,7 +35,7 @@ class PluginAbhi(plugintypes.IPluginExtended):
         self.url = url
 
     def activate(self):
-        r = requests.get(self.url+'start')
+        r = requests.get(self.url+'start') #server
         if len(self.args) > 0:
             if 'no_time' in self.args:
                 self.file_name = self.args[0]
@@ -63,7 +63,7 @@ class PluginAbhi(plugintypes.IPluginExtended):
         
     def deactivate(self):
         print "Done collecting data"
-        r = requests.get(self.url+'end')
+        r = requests.get(self.url+'end') #server
         return
 
     def show_help(self):
@@ -76,12 +76,13 @@ class PluginAbhi(plugintypes.IPluginExtended):
         res = row.split(",")
         # pprint(len(res))
         timestamp = res[0]
-        sample_number = res[1]
-        channel_values = res[2:11]
+        sample_number = res[2]
+        channel_values = res[3:11]
         aux_values = res[11:14]
         # self.live_graph(channel_values[0])
-        res_json = {"timestamp" : timestamp, "sample_number" : sample_number, "channel_values" : channel_values, "aux_values" : aux_values, "delay" : 0.1}
-        r = requests.post(self.url+'data', data=res_json)
+        res_json = {"timestamp" : timestamp, "sample_number" : sample_number, "channel_values" : channel_values, "aux_values" : aux_values, "delay" : 1}
+        pprint(res_json)
+        r = requests.post(self.url+'data', data=res_json) #server
         # pprint('person name is ' + self.person)
 
 
@@ -101,16 +102,16 @@ class PluginAbhi(plugintypes.IPluginExtended):
     '''
     following doesn't work yet
     '''
-    def live_graph(self,data):
-        pprint("hello")
-        ymin = float(min(ydata))-10
-        ymax = float(max(ydata))+10
-        plt.ylim([ymin,ymax])
-        ydata.append(data)
-        del ydata[0]
-        line.set_xdata(np.arange(len(ydata)))
-        line.set_ydata(ydata)  # update the data
-        plt.draw() # update the plot
+    # def live_graph(self,data):
+    #     pprint("hello")
+    #     ymin = float(min(ydata))-10
+    #     ymax = float(max(ydata))+10
+    #     plt.ylim([ymin,ymax])
+    #     ydata.append(data)
+    #     del ydata[0]
+    #     line.set_xdata(np.arange(len(ydata)))
+    #     line.set_ydata(ydata)  # update the data
+    #     plt.draw() # update the plot
 
     def train(self,row):
     # this function will be used to train and calibrate for the individual 

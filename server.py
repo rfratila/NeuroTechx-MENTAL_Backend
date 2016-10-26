@@ -14,13 +14,13 @@ def start():
 
 @app.route('/data', methods=['POST'])
 def data():
-    x = request.form['timestamp']
+    x = request.form['sample_number']
     ys = request.form['channel_values']
     delay = request.form['delay']
     li = []
     for y in ys:
         li.append({"x" : x, 'y' : y})
-    process(3, li, delay)
+    process(8, li, delay)
     return ""
 
 @app.route('/end')

@@ -54,42 +54,42 @@ def process(number, inputs,delay):
         s.write(dict(x=inputs[i]['x'],y=inputs[i]['y']))
     time.sleep(delay)
 
-def test():
-    # used to run tests without an actual openbci plugged in
-    initialize()
-    setup_streams(3,80)
-    setup_traces(3)
-    setup_plot('Time-Series','python-streaming')
-    setup_stream_links(3)
-    for i in range(0,3):
-        stream_links[i].open()
-    k = 5
-    i =0 
-    time.sleep(5)
-    q = 0
-    while not end_value: 
-        x = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
-        y = []
-        for p in range(1,4):
-            y_i = q%p
-            y.append(y_i)
-            q = q+1
-        process(3, [{'x':x,'y':y[0]},{'x':x,'y':y[1]},{'x':x,'y':y[2]}],0.5)
-    for i in range(0, 3):
-        stream_links[i].close()
+# def test():
+#     # used to run tests without an actual openbci plugged in
+#     initialize()
+#     setup_streams(3,80)
+#     setup_traces(3)
+#     setup_plot('Time-Series','python-streaming')
+#     setup_stream_links(3)
+#     for i in range(0,3):
+#         stream_links[i].open()
+#     k = 5
+#     i =0 
+#     time.sleep(5)
+#     q = 0
+#     while not end_value: 
+#         x = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
+#         y = []
+#         for p in range(1,4):
+#             y_i = q%p
+#             y.append(y_i)
+#             q = q+1
+#         process(3, [{'x':x,'y':y[0]},{'x':x,'y':y[1]},{'x':x,'y':y[2]}],0.5)
+#     for i in range(0, 3):
+#         stream_links[i].close()
 
 def testrun():
     initialize()
-    setup_streams(3,80)
-    setup_traces(3)
+    setup_streams(8,80)
+    setup_traces(8)
     setup_plot('Time-Series','python-streaming')
-    setup_stream_links(3)
-    for i in range(0,3):
+    setup_stream_links(8)
+    for i in range(0,8):
         stream_links[i].open()
 
 
 def stop():
-    for i in range(0, 3):
+    for i in range(0, 8):
         stream_links[i].close()
 
 # test()
