@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from graphing import *
 from pprint import pprint
 app = Flask(__name__)
@@ -28,6 +28,9 @@ def end():
     stop()
     return "Stop executed"
 
+@app.route('/testjson')
+def testjson():
+    return jsonify({"first" : [1,2,3,4], "second" : {"test1" : "test2"}})
 
 if __name__ == "__main__":
     app.run(debug=True)
