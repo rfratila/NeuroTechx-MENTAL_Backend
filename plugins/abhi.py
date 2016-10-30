@@ -20,7 +20,7 @@ import plugin_interface as plugintypes
 import requests
 
 class PluginAbhi(plugintypes.IPluginExtended):
-    def __init__(self, delim = ",", verbose=False, train=False, acquire=False, person="Typhlosion", url='http://127.0.0.1:5000/', graph=False):
+    def __init__(self, delim = ",", verbose=False, train=False, acquire=False, person="Typhlosion", url='http://127.0.0.1:5000/', graph=False, recording_session_number=0):
         now = datetime.datetime.now()
         self.time_stamp = '%d-%d-%d_%d-%d-%d'%(now.year,now.month,now.day,now.hour,now.minute,now.second)
         self.file_name = self.time_stamp
@@ -29,10 +29,11 @@ class PluginAbhi(plugintypes.IPluginExtended):
         self.verbose = verbose
         self.train = train
         self.acquire = acquire
-        self.training_set = {}
+        self.training_set = []
         self.person = person
         self.url = url
         self.graph = graph
+        self.recording_session_number = recording_session_number
 
     def activate(self):
         if self.graph:
@@ -66,6 +67,8 @@ class PluginAbhi(plugintypes.IPluginExtended):
         print "Done collecting data"
         if self.graph:
             r = requests.get(self.url+'end') #server
+        with open('../data/'+self.person+"_"+str(self.recording_session_number)+'.json') as outfile:
+            json.dump(self.training_set, outfile)
         return
 
     def show_help(self):
@@ -83,6 +86,7 @@ class PluginAbhi(plugintypes.IPluginExtended):
         aux_values = res[11:14]
         # self.live_graph(channel_values[0])
         res_json = {"timestamp" : timestamp, "sample_number" : sample_number, "channel_values" : channel_values, "aux_values" : aux_values, "delay" : 1}
+        self.training_set.append(res_json)
         pprint(res_json)
         if self.graph:
             r = requests.post(self.url+'data', data=res_json) #server
