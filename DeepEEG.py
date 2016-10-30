@@ -6,6 +6,7 @@ import theano.tensor as T
 import os
 
 from collections import OrderedDict
+import pylab #for graphing
 
 #TODO:
 #Save some recordings for validation
@@ -109,18 +110,26 @@ def main():
 
 	iterations = 30
 	print ("Training for %s iterations"%iterations)
-	record = OrderedDict()
+	record = OrderedDict(iteration=[],error=[],accuracy=[])
 	for i in xrange(iterations):
 		chooseRandomly = numpy.random.randint(data['input'].shape[0])
-		print 'Patient: %d'%chooseRandomly
+		print "Iteration: %d on patient: %d"%(i,chooseRandomly)
+
 		trainIn = data['input'][chooseRandomly].reshape([1,1] + list(data['input'][chooseRandomly].shape))
 		trainer(trainIn, numpy.expand_dims(data['truth'][chooseRandomly], axis=0))
 		
 		error, accuracy = validator(trainIn, numpy.expand_dims(data['truth'][chooseRandomly], axis=0))			     #pass modified data through network
-		record['error'] = error
-		record['accuracy'] = accuracy
-		record['iteration'] = i
+		record['error'].append(error)
+		record['accuracy'].append(accuracy)
+		record['iteration'].append(i)
 		print "error: ",error,"and accuracy: ", accuracy
-	saveModel(network=network,modelName='testing123')
 
+
+	saveModel(network=network,modelName='testing123')
+	pylab.plot(record['iteration'],record['error'], '-ro',label='TrErr')
+	pylab.plot(record['iteration'],record['accuracy'],'-go',label='TrAcc')
+	pylab.xlabel("Iteration")
+	pylab.ylabel("Percentage")
+	pylab.ylim(0,1)
+	pylab.show()
 main()
