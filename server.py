@@ -1,6 +1,8 @@
 from flask import Flask, request, jsonify
 from graphing import *
 from pprint import pprint
+from bci_workshop_tools import *
+
 app = Flask(__name__)
 
 @app.route('/')
