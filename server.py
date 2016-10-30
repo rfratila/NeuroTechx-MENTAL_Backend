@@ -34,9 +34,5 @@ def end():
 def testjson():
     return jsonify({"first" : [1,2,3,4], "second" : {"test1" : "test2"}})
 
-@app.route('/recording1')
-def recording():
-    
-
 if __name__ == "__main__":
     app.run(debug=True)
