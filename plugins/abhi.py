@@ -13,6 +13,7 @@ acquire -> check threshold value -> event_processor
 import csv
 import timeit
 import datetime
+import time
 import json
 from pprint import pprint
 # import numpy as np
@@ -20,7 +21,7 @@ import plugin_interface as plugintypes
 import requests
 
 class PluginAbhi(plugintypes.IPluginExtended):
-    def __init__(self, delim = ",", verbose=False, train=False, acquire=False, person="Typhlosion", url='http://127.0.0.1:5000/', graph=False, recording_session_number=0):
+    def __init__(self, delim = ",", verbose=False, train=False, acquire=False, person="Typhlosion", url='http://127.0.0.1:5000/', graph=False, recording_session_number=0, window_size=5):
         now = datetime.datetime.now()
         self.time_stamp = '%d-%d-%d_%d-%d-%d'%(now.year,now.month,now.day,now.hour,now.minute,now.second)
         self.file_name = self.time_stamp
@@ -34,6 +35,9 @@ class PluginAbhi(plugintypes.IPluginExtended):
         self.url = url
         self.graph = graph
         self.recording_session_number = recording_session_number
+        self.window_size = window_size
+        self.last_time = self.start_time
+        self.elapsed_time = 0
 
     def activate(self):
         if self.graph:
@@ -49,6 +53,8 @@ class PluginAbhi(plugintypes.IPluginExtended):
                 self.train = True
             if 'acquire' in self.args:
                 self.acquire = True
+            if 'graph' in self.args:
+                self.graph = True
             if 'person' in self.args:
                 for x in range(0,len(self.args)):
                     if self.args[x]=='person':
@@ -56,6 +62,13 @@ class PluginAbhi(plugintypes.IPluginExtended):
                                 self.person = self.args[x+1]
                             except:
                                 self.person = "Not assigned"
+            if 'window_size' in self.args:
+                for x in range(0,len(self.args)):
+                    if self.args[x]=='window_size':
+                            try:
+                                self.window_size = self.args[x+1]
+                            except:
+                                self.window_size = "Not assigned"
 
         self.file_name = self.file_name + '.csv'
         # print "Will export CSV to:", self.file_name
@@ -67,8 +80,9 @@ class PluginAbhi(plugintypes.IPluginExtended):
         print "Done collecting data"
         if self.graph:
             r = requests.get(self.url+'end') #server
-        with open('../data/'+self.person+"_"+str(self.recording_session_number)+'.json') as outfile:
-            json.dump(self.training_set, outfile)
+        data = {"data" : self.training_set}
+        with open("data/"+self.person+"_"+str(self.recording_session_number)+'.json','w') as outfile:
+            json.dump(data, outfile)
         return
 
     def show_help(self):
@@ -87,7 +101,7 @@ class PluginAbhi(plugintypes.IPluginExtended):
         # self.live_graph(channel_values[0])
         res_json = {"timestamp" : timestamp, "sample_number" : sample_number, "channel_values" : channel_values, "aux_values" : aux_values, "delay" : 1}
         self.training_set.append(res_json)
-        pprint(res_json)
+        # pprint(res_json)
         if self.graph:
             r = requests.post(self.url+'data', data=res_json) #server
         # pprint('person name is ' + self.person)
@@ -131,7 +145,12 @@ class PluginAbhi(plugintypes.IPluginExtended):
 
     def __call__(self, sample):
         t = timeit.default_timer() - self.start_time
-
+        temp = t - self.last_time
+        self.last_time = t
+        self.elapsed_time += temp
+        pprint(temp)
+        # pprint(self.elapsed_time)
+        
         #print timeSinceStart|Sample Id
         # if self.verbose:
         #     print("CSV: %f | %d" %(t,sample.id))
@@ -139,8 +158,10 @@ class PluginAbhi(plugintypes.IPluginExtended):
         #     print ("value of train set to True")
         # if self.acquire:
         #     print ("value of acquire set to True")
-        curr = datetime.datetime.now()
-        curr_time = '%d-%d-%d_%d-%d-%d-%d'%(curr.year,curr.month,curr.day,curr.hour,curr.minute,curr.second, curr.microsecond)
+        
+        # curr = datetime.datetime.now()
+        # curr_time = '%d-%d-%d_%d-%d-%d-%d'%(curr.year,curr.month,curr.day,curr.hour,curr.minute,curr.second, curr.microsecond)
+        curr_time = time.time()
         row = ''
         row += "Timestamp : " + str(curr_time)
         row += self.delim
