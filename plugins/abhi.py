@@ -21,7 +21,7 @@ import plugin_interface as plugintypes
 import requests
 
 class PluginAbhi(plugintypes.IPluginExtended):
-    def __init__(self, delim = ",", verbose=False, train=False, acquire=False, person="Typhlosion", url='http://127.0.0.1:5000/', graph=False, recording_session_number=0, window_size=5):
+    def __init__(self, delim = ",", verbose=False, train=False, acquire=False, person="Typhlosion", url='http://127.0.0.1:5000/', graph=False, recording_session_number=0, window_size=5, attentive=False):
         now = datetime.datetime.now()
         self.time_stamp = '%d-%d-%d_%d-%d-%d'%(now.year,now.month,now.day,now.hour,now.minute,now.second)
         self.file_name = self.time_stamp
@@ -39,6 +39,7 @@ class PluginAbhi(plugintypes.IPluginExtended):
         self.last_time = self.start_time
         self.elapsed_time = 0
         self.sample_numbers = 0
+        self.attentive = attentive
 
     def activate(self):
         if self.graph:
@@ -56,6 +57,8 @@ class PluginAbhi(plugintypes.IPluginExtended):
                 self.acquire = True
             if 'graph' in self.args:
                 self.graph = True
+            if 'attentive' in self.args:
+                self.attentive = True
             if 'person' in self.args:
                 for x in range(0,len(self.args)):
                     if self.args[x]=='person':
@@ -90,7 +93,10 @@ class PluginAbhi(plugintypes.IPluginExtended):
         if self.graph:
             r = requests.get(self.url+'end') #server
         data = {"data" : self.training_set}
-        with open("data/"+self.person+"_"+str(self.recording_session_number)+'.json','w') as outfile:
+        att_folder = 'inattentive'
+        if self.attentive:
+            att_folder = 'attentive'
+        with open("data/"+att_folder+"/"+self.person+"_"+str(self.recording_session_number)+'.json','w') as outfile:
             json.dump(data, outfile)
         return
 
