@@ -44,6 +44,7 @@ def getData(dataPath):
 	data = OrderedDict(input=numpy.array(data, dtype='float32'), truth=numpy.array(trainOut, dtype='float32'))
 	return data
 
+#be able to read from an Attentive folder and create their truth values
 def getJsonData(dataPath):
 
 	trainOut = numpy.array([[1,0]]) #this will contain the actual state of the brain
@@ -80,17 +81,12 @@ def createNetwork(dimensions, input_var):
 def createTrainer(network,input_var,y):
 	#output of network
 	out = lasagne.layers.get_output(network)
-	#view_fn = theano.function([input_var], out)
-
 	#get all parameters from network
 	params = lasagne.layers.get_all_params(network, trainable=True)
-
 	#calculate a loss function which has to be a scalar
 	cost = T.nnet.categorical_crossentropy(out, y).mean()
-
 	#calculate updates using ADAM optimization gradient descent
 	updates = lasagne.updates.adam(cost, params, learning_rate=0.001, beta1=0.9, beta2=0.999, epsilon=1e-08)
-
 	#theano function to compare brain to their masks with ADAM optimization
 	train_function = theano.function([input_var, y], updates=updates) # omitted (, allow_input_downcast=True)
 	return train_function
@@ -132,15 +128,17 @@ def main():
 	#dataPath = '/home/rfratila/Desktop/MENTALdata/'
 	input_var = T.tensor4('input')
 	y = T.dmatrix('truth')
-	trainFromScratch = False
+	trainFromScratch = True
 	trainingSet = []
 	counter=0
 
-	for patient in os.listdir(dataPath):
+	for patient in os.listdir('%s%s'%(dataPath,'attentive')):
+		import pudb; pu.db
 		if patient.endswith('.json'):
 			trainingSet.append(patient)
 			counter+=1
 	print "%i samples found"%counter
+
 	data = getJsonData("%s%s"%(dataPath,trainingSet[0]))
 
 	print ("Creating Network...")
