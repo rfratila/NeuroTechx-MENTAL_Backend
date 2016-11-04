@@ -21,7 +21,7 @@ import plugin_interface as plugintypes
 import requests
 
 class PluginAbhi(plugintypes.IPluginExtended):
-    def __init__(self, delim = ",", verbose=False, train=False, acquire=False, person="Typhlosion", url='http://127.0.0.1:5000/', graph=False, recording_session_number=0, window_size=5, attentive=False):
+    def __init__(self, delim = ",", verbose=False, train=False, acquire=False, person="Typhlosion", url='http://127.0.0.1:5000/', graph=False, recording_session_number=0, window_size=10000, attentive=False):
         now = datetime.datetime.now()
         self.time_stamp = '%d-%d-%d_%d-%d-%d'%(now.year,now.month,now.day,now.hour,now.minute,now.second)
         self.file_name = self.time_stamp
