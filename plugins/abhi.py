@@ -38,6 +38,7 @@ class PluginAbhi(plugintypes.IPluginExtended):
         self.window_size = window_size
         self.last_time = self.start_time
         self.elapsed_time = 0
+        self.sample_numbers = 0
 
     def activate(self):
         if self.graph:
@@ -69,6 +70,14 @@ class PluginAbhi(plugintypes.IPluginExtended):
                                 self.window_size = self.args[x+1]
                             except:
                                 self.window_size = "Not assigned"
+            
+            if 'recording_session_number' in self.args:
+                for x in range(0,len(self.args)):
+                    if self.args[x]=='recording_session_number':
+                            try:
+                                self.recording_session_number = self.args[x+1]
+                            except:
+                                self.recording_session_number = "Not assigned"
 
         self.file_name = self.file_name + '.csv'
         # print "Will export CSV to:", self.file_name
@@ -145,12 +154,22 @@ class PluginAbhi(plugintypes.IPluginExtended):
 
     def __call__(self, sample):
         t = timeit.default_timer() - self.start_time
-        temp = t - self.last_time
-        self.last_time = t
-        self.elapsed_time += temp
-        pprint(temp)
+
+        '''
+        Code below to limit sample collection by time intervals
+        '''
+        # temp = t - self.last_time
+        # self.last_time = t
+        # self.elapsed_time += temp
+        # pprint(temp)
         # pprint(self.elapsed_time)
-        
+        '''
+        Code below to limit the number of samples collected 
+        '''
+        self.sample_numbers += 1
+        if self.sample_numbers >= self.window_size:
+            self.deactivate()
+
         #print timeSinceStart|Sample Id
         # if self.verbose:
         #     print("CSV: %f | %d" %(t,sample.id))
