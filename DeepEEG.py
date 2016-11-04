@@ -9,6 +9,7 @@ from collections import OrderedDict
 import pylab #for graphing
 
 import json
+from random import shuffle
 
 #TODO:
 #have a fully convolutional layer to account for variable recording time
@@ -24,12 +25,12 @@ def softmax(x):
 def getData(dataPath):
 
 	trainingSet =[]
-	counter = 0
+
 	for patient in os.listdir(dataPath):
 		if patient.endswith('.mat'):
 			trainingSet.append(patient)
-			counter+=1
-	print "%i samples found"%counter
+
+	print "%i samples found"%len(trainingSet)
 
 	trainOut = [[1,0],[0,1]]*len(trainingSet) #this will contain the actual state of the brain
 
@@ -46,8 +47,10 @@ def getData(dataPath):
 
 #be able to read from an Attentive folder and create their truth values
 def getJsonData(dataPath):
-
-	trainOut = numpy.array([[1,0]]) #this will contain the actual state of the brain
+	if 'inattentive' in dataPath:
+		trainOut = numpy.array([[0,1]]) #this will contain the actual state of the brain: inattentive
+	else:
+		trainOut = numpy.array([[1,0]]) #this will contain the actual state of the brain: attentive
 	data =[]
 	res = {}
 	with open(dataPath) as infile:
@@ -116,11 +119,11 @@ def testNetwork(network,input_var,dataPath,trainingSet):
 	out = lasagne.layers.get_output(network)
 	test_fn = theano.function([input_var],out)
 
-	data = getJsonData("%s%s"%(dataPath,trainingSet[2]))
+	data = getJsonData(trainingSet[0])
 	trainIn = data['input'].reshape([1,1] + list(data['input'].shape))
 
 	print "Sample: ", trainingSet[2]
-	print "Prediction: Attentive" if test_fn(trainIn)[0,0] == 1 else "Prediction: Not Attentive",
+	print "Prediction: Attentive" if test_fn(trainIn)[0,0] == 1 else "Prediction: Inattentive",
 	
 
 def main():
@@ -130,22 +133,20 @@ def main():
 	y = T.dmatrix('truth')
 	trainFromScratch = True
 	trainingSet = []
-	counter=0
 
-	for patient in os.listdir(dataPath):
+	for patient in [dataPath]:
 
 		attentivePath = os.path.join(dataPath,'attentive')
 		inattentivePath = os.path.join(dataPath,'inattentive')
 
 		if os.path.exists(attentivePath) and os.path.exists(inattentivePath):
-			for i in os.listdir(attentivePath):
-				print i
-		#if patient.endswith('.json'):
-		#	trainingSet.append(patient)
-		#	counter+=1
-	print "%i samples found"%counter
-	import pudb; pu.db
-	data = getJsonData("%s%s"%(dataPath,trainingSet[0]))
+			trainingSet += [os.path.join(attentivePath,i) for i in os.listdir(attentivePath)]
+			trainingSet += [os.path.join(inattentivePath,i) for i in os.listdir(inattentivePath)  if i.endswith('.json')]
+			shuffle(trainingSet)
+
+	print "%i samples found"%len(trainingSet)
+
+	data = getJsonData(trainingSet[0])
 
 	print ("Creating Network...")
 	networkDimensions = (1,1,data['input'].shape[0],data['input'].shape[1])
@@ -165,13 +166,14 @@ def main():
 	record = OrderedDict(iteration=[],error=[],accuracy=[])
 
 	for i in xrange(iterations):
-		chooseRandomly = numpy.random.randint(counter)
+		chooseRandomly = numpy.random.randint(len(trainingSet))
 		print ("\nGathering data...%s"%trainingSet[chooseRandomly])
-		data = getJsonData("%s%s"%(dataPath,trainingSet[chooseRandomly]))
+		data = getJsonData(trainingSet[chooseRandomly])
 
 		print "--> Iteration: %d"%(i)
 
 		trainIn = data['input'].reshape([1,1] + list(data['input'].shape))
+
 		trainer(trainIn, data['truth'])
 		
 		error, accuracy = validator(trainIn, data['truth'])			     #pass modified data through network
