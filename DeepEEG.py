@@ -124,7 +124,7 @@ def testNetwork(network,input_var,dataPath,trainingSet):
 	
 
 def main():
-	dataPath = 'data/'
+	dataPath = 'data'
 	#dataPath = '/home/rfratila/Desktop/MENTALdata/'
 	input_var = T.tensor4('input')
 	y = T.dmatrix('truth')
@@ -132,13 +132,19 @@ def main():
 	trainingSet = []
 	counter=0
 
-	for patient in os.listdir('%s%s'%(dataPath,'attentive')):
-		import pudb; pu.db
-		if patient.endswith('.json'):
-			trainingSet.append(patient)
-			counter+=1
-	print "%i samples found"%counter
+	for patient in os.listdir(dataPath):
 
+		attentivePath = os.path.join(dataPath,'attentive')
+		inattentivePath = os.path.join(dataPath,'inattentive')
+
+		if os.path.exists(attentivePath) and os.path.exists(inattentivePath):
+			for i in os.listdir(attentivePath):
+				print i
+		#if patient.endswith('.json'):
+		#	trainingSet.append(patient)
+		#	counter+=1
+	print "%i samples found"%counter
+	import pudb; pu.db
 	data = getJsonData("%s%s"%(dataPath,trainingSet[0]))
 
 	print ("Creating Network...")
