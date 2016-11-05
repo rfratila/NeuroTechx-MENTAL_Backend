@@ -45,6 +45,7 @@ Flask, sklearn, yapsy, plotly, scipy
 ## How to use the window_size and attentive 
 in addition to the instructions in the "To run the plugin" section, if you need to limit the number of samples being collected add the argument "window_size" followed by the number of samples to collect (default value is 10000). 
 To mark data as attentive pass "attentive" as an argument to the above command, passing nothing means that it will store the data under the inattentive folder under the data folder  
+To choose the recording session use recording_session_number followed by a space and the number so it will save to different files 
 
 
 
