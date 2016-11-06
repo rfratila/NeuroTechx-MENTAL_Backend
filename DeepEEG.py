@@ -163,7 +163,7 @@ def main():
 	trainingReserve = 1-(testReserve+validationReserve)
 	input_var = T.tensor4('input')
 	y = T.dmatrix('truth')
-	trainFromScratch = False
+	trainFromScratch = True
 	dataSet = []
 
 	for patient in [dataPath]:
