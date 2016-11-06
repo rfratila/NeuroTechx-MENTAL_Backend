@@ -70,24 +70,28 @@ def getJsonData(dataPath):
 	for timeStamp in res['data']:
 		data.append(numpy.array(timeStamp['channel_values'],dtype='float32'))		
 	data = numpy.stack(data,axis=1)
-	data = numpy.resize(data,(data.shape[0],1500))
+	data = numpy.resize(data,(data.shape[0],300000))
 	data = OrderedDict(input=numpy.array(data, dtype='float32'), truth=numpy.array(trainOut, dtype='float32'))
 	return data
 
 def createNetwork(dimensions, input_var):
 	#dimensions = (1,1,data.shape[0],data.shape[1]) #We have to specify the input size because of the dense layer
 	#We have to specify the input size because of the dense layer
-	dense=True
+	dense=False
 	network = lasagne.layers.InputLayer(shape=dimensions,input_var=input_var)
 	print 'Input Layer:'
 	print '	',lasagne.layers.get_output_shape(network)
 	print 'Hidden Layer:'
 	if dense:
-		network = lasagne.layers.DenseLayer(network, num_units=800, nonlinearity=lasagne.nonlinearities.rectify)
+		network = lasagne.layers.DenseLayer(network, num_units=1000, nonlinearity=lasagne.nonlinearities.rectify)
 		network = lasagne.layers.DropoutLayer(network,p=0.2)
 		print '	',lasagne.layers.get_output_shape(network)
 
-		network = lasagne.layers.DenseLayer(network, num_units=800, nonlinearity=lasagne.nonlinearities.rectify)
+		network = lasagne.layers.DenseLayer(network, num_units=1000, nonlinearity=lasagne.nonlinearities.rectify)
+		network = lasagne.layers.DropoutLayer(network,p=0.2)
+		print '	',lasagne.layers.get_output_shape(network)
+
+		network = lasagne.layers.DenseLayer(network, num_units=1000, nonlinearity=lasagne.nonlinearities.rectify)
 		network = lasagne.layers.DropoutLayer(network,p=0.2)
 		print '	',lasagne.layers.get_output_shape(network)
 	else:
@@ -163,7 +167,7 @@ def main():
 	trainingReserve = 1-(testReserve+validationReserve)
 	input_var = T.tensor4('input')
 	y = T.dmatrix('truth')
-	trainFromScratch = True
+	trainFromScratch = False
 	dataSet = []
 
 	for patient in [dataPath]:
@@ -196,7 +200,7 @@ def main():
 
 	if not trainFromScratch:
 		print 'loading a previously trained model...\n'
-		network = loadModel(network,'testing123.npz')
+		network = loadModel(network,'conv2Layer.npz')
 
 	epochs = 10
 	samplesperEpoch = 10
@@ -224,7 +228,7 @@ def main():
 
 	validateNetwork(network,input_var,validationSet)
 
-	saveModel(network=network,modelName='testing123')
+	saveModel(network=network,modelName='conv2Layer')
 	pylab.plot(record['iteration'],record['error'], '-ro',label='TrErr')
 	pylab.plot(record['iteration'],record['accuracy'],'-go',label='TrAcc')
 	pylab.xlabel("Iteration")
