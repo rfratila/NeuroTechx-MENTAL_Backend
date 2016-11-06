@@ -40,7 +40,9 @@ class PluginAbhi(plugintypes.IPluginExtended):
         self.elapsed_time = 0
         self.sample_numbers = 0
         self.attentive = attentive
-
+        self.first_call = True
+        self.record_start_time = 0
+        
     def activate(self):
         if self.graph:
             r = requests.get(self.url+'start') #server
@@ -90,10 +92,12 @@ class PluginAbhi(plugintypes.IPluginExtended):
         
     def deactivate(self):
         print "Done collecting data"
+        recording_time = time.time() - self.record_start_time
         if self.graph:
             r = requests.get(self.url+'end') #server
-        data = {"data" : self.training_set}
+        data = {"data" : self.training_set, "sample_rate" : self.sample_numbers/recording_time}
         att_folder = 'inattentive'
+        
         if self.attentive:
             att_folder = 'attentive'
         with open("data/"+att_folder+"/"+self.person+"_"+str(self.recording_session_number)+'.json','w') as outfile:
@@ -159,6 +163,9 @@ class PluginAbhi(plugintypes.IPluginExtended):
         return "null"
 
     def __call__(self, sample):
+        if self.first_call:
+            self.record_start_time = time.time()
+            self.first_call = False
         t = timeit.default_timer() - self.start_time
 
         '''
