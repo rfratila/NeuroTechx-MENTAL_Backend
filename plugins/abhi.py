@@ -21,7 +21,7 @@ import plugin_interface as plugintypes
 import requests
 
 class PluginAbhi(plugintypes.IPluginExtended):
-    def __init__(self, delim = ",", verbose=False, train=False, acquire=False, person="Typhlosion", url='http://127.0.0.1:5000/', graph=False, recording_session_number=0, window_size=10000, attentive=False):
+    def __init__(self, delim = ",", verbose=False, train=False, acquire=False, person="Typhlosion", url='http://127.0.0.1:5000/', graph=False, recording_session_number=0, window_size=10, attentive=False):
         now = datetime.datetime.now()
         self.time_stamp = '%d-%d-%d_%d-%d-%d'%(now.year,now.month,now.day,now.hour,now.minute,now.second)
         self.file_name = self.time_stamp
@@ -72,7 +72,7 @@ class PluginAbhi(plugintypes.IPluginExtended):
                 for x in range(0,len(self.args)):
                     if self.args[x]=='window_size':
                             try:
-                                self.window_size = self.args[x+1]
+                                self.window_size = (self.args[x+1])*1000
                             except:
                                 self.window_size = "Not assigned"
             
