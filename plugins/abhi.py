@@ -19,6 +19,7 @@ from pprint import pprint
 # import numpy as np
 import plugin_interface as plugintypes
 import requests
+import sys
 
 class PluginAbhi(plugintypes.IPluginExtended):
     def __init__(self, delim = ",", verbose=False, train=False, acquire=False, person="Typhlosion", url='http://127.0.0.1:5000/', graph=False, recording_session_number=0, window_size=10, attentive=False):
@@ -72,7 +73,7 @@ class PluginAbhi(plugintypes.IPluginExtended):
                 for x in range(0,len(self.args)):
                     if self.args[x]=='window_size':
                             try:
-                                self.window_size = (self.args[x+1])*1000
+                                self.window_size = ((int)(self.args[x+1]))*1000
                             except:
                                 self.window_size = "Not assigned"
             
@@ -114,7 +115,7 @@ class PluginAbhi(plugintypes.IPluginExtended):
         res = row.split(",")
         # pprint(len(res))
         timestamp = res[0]
-        sample_number = res[2]
+        sample_number = self.sample_numbers
         channel_values = res[3:11]
         aux_values = res[11:14]
         # self.live_graph(channel_values[0])
@@ -180,8 +181,10 @@ class PluginAbhi(plugintypes.IPluginExtended):
         Code below to limit the number of samples collected 
         '''
         self.sample_numbers += 1
-        if self.sample_numbers >= self.window_size:
-            self.deactivate()
+        if self.sample_numbers > self.window_size:
+            pprint(str(self.sample_numbers-1) + " samples have been collected, please type in /stop to finish")
+            sys.exit()
+            #TODO add code to auto exit the entire plugin 
 
         #print timeSinceStart|Sample Id
         # if self.verbose:
