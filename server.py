@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from graphing import *
 from pprint import pprint
 from bci_workshop_tools import *
-from DeepEEG import getState
+# from DeepEEG import getState
 import subprocess
 
 app = Flask(__name__)
@@ -40,10 +40,9 @@ def testjson():
 
 @app.route('/registerPerson', methods=['POST'])
 def registerPerson():
-    person_name = form.data['name']
-    time_interval = form.data['time_interval']
-    pprint("person_name is " + person_name)
-    pprint("time_interval is " + time_interval)
+    person_name = request.form['name']
+    time_interval = request.form['time_interval']
+    return "done"
 
 @app.route('/callEEG')
 def callEEG():
