@@ -4,7 +4,7 @@ from pprint import pprint
 # from bci_workshop_tools import *
 # from DeepEEG import getState
 from subprocess import Popen, PIPE, STDOUT, call, check_call
-import user
+# import user
 
 app = Flask(__name__)
 person_name = ""
@@ -55,7 +55,7 @@ def registerPerson():
     pprint(request)
     pprint(request.args)
     pprint(request.form)
-    temp = jsonify(request.get_json())
+    temp = request.get_json()
     person_name = temp['name']
     time_interval = temp['time_interval']
     pprint("person_name is " + person_name)
