@@ -1,9 +1,10 @@
 from flask import Flask, request, jsonify
-from graphing import *
+# from graphing import *
 from pprint import pprint
-from bci_workshop_tools import *
+# from bci_workshop_tools import *
 # from DeepEEG import getState
-import subprocess
+from subprocess import Popen, PIPE, STDOUT, call, check_call
+import user
 
 app = Flask(__name__)
 person_name = ""
@@ -15,7 +16,18 @@ def hello():
 
 @app.route('/start')
 def start():
-    subprocess.call("test.sh")
+
+    # dummy = "-p /dev/tty.usbserial-DB00J8RE --add abhi person Jake window_size 1 recording_session_number 12 attentive"
+    # args_list = dummy.split(" ")
+    # p = Popen(["python", "user.py"] + args_list, stdout=PIPE, stdin=PIPE)
+    # out, err = p.communicate()
+
+    # p = Popen(["./start.sh"])
+    temp = "python user.py -p /dev/tty.usbserial-DB00J8RE --add abhi person Jake window_size 1 recording_session_number 12 attentive"
+    p = Popen(temp.split(" "))
+    board = user.giveBoard()
+
+    # rc = p.poll()
     return "Initializing"
 
 @app.route('/data', methods=['POST'])
@@ -43,8 +55,9 @@ def registerPerson():
     pprint(request)
     pprint(request.args)
     pprint(request.form)
-    person_name = request.form['name']
-    time_interval = request.form['time_interval']
+    temp = jsonify(request.get_json())
+    person_name = temp['name']
+    time_interval = temp['time_interval']
     pprint("person_name is " + person_name)
     pprint("time_interval is "+ time_interval)
     return jsonify({"name" : person_name, "time_interval" : time_interval})
