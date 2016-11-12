@@ -1,3 +1,5 @@
 api_keys.json
 *.npz
 *.cpython
+*.pyc
+plugins/*.pyc
