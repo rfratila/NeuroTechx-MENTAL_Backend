@@ -40,6 +40,9 @@ def testjson():
 
 @app.route('/registerPerson', methods=['POST'])
 def registerPerson():
+    pprint(request)
+    pprint(request.args)
+    pprint(request.form)
     person_name = request.form['name']
     time_interval = request.form['time_interval']
     pprint("person_name is " + person_name)
