@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 # from graphing import *
 from pprint import pprint
 # from bci_workshop_tools import *
@@ -9,7 +10,7 @@ from subprocess import Popen, PIPE, STDOUT, call, check_call
 app = Flask(__name__)
 person_name = ""
 time_interval = ""
-
+CORS(app)
 @app.route('/')
 def hello():
     return "Welcome to the local server"
