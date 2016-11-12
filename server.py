@@ -42,6 +42,8 @@ def testjson():
 def registerPerson():
     person_name = request.form['name']
     time_interval = request.form['time_interval']
+    pprint("person_name is " + person_name)
+    pprint("time_interval is "+ time_interval)
     return jsonify({"name" : person_name, "time_interval" : time_interval})
 
 @app.route('/callEEG')
