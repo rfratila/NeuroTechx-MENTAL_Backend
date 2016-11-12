@@ -152,12 +152,33 @@ def validateNetwork(network,input_var,validationSet):
 	print '\n Validating the network'
 	out = lasagne.layers.get_output(network)
 	test_fn = theano.function([input_var],out)
+	attentiveCount = 0
 	for sample in validationSet:
 		data = getJsonData(sample)
 		trainIn = data['input'].reshape([1,1] + list(data['input'].shape))
 
 		print "Sample: ", sample
-		print "Prediction: Attentive" if test_fn(trainIn)[0,0] == 1 else "Prediction: Inattentive"
+		if test_fn(trainIn)[0,0] == 1 and "attentive" in sample:
+			print "Prediction: Attentive" 
+			attentiveCount+=1
+
+		else: 
+			print "Prediction: Inattentive"
+
+#input: person_Name, timeIntervalBetweenSamples
+#output: json file with date,personName (YYYY/MM/DD/HH/DD)
+def getState(name,timeInterval,sample):
+	dataPath = os.path.join('data',name)
+	input_var = T.tensor4('input')
+	print "Loading sample..."os.path.join(dataPath,sample)
+	inputDim = getJsonData(os.path.join(dataPath,sample))
+
+	print ("Creating Network...")
+	networkDimensions = (1,1,inputDim['input'].shape[0],inputDim['input'].shape[1])
+	network  = createNetwork(networkDimensions, input_var)
+	print 'loading a previously trained model...\n'
+	network = loadModel(network,'conv2Layer.npz')
+
 
 def main():
 	dataPath = 'data'
@@ -167,7 +188,7 @@ def main():
 	trainingReserve = 1-(testReserve+validationReserve)
 	input_var = T.tensor4('input')
 	y = T.dmatrix('truth')
-	trainFromScratch = False
+	trainFromScratch = True
 	dataSet = []
 
 	for patient in [dataPath]:
@@ -225,10 +246,11 @@ def main():
 		record['accuracy'].append(accuracy)
 		record['iteration'].append(epoch)
 		print "	error: ",error,"and accuracy: ", accuracy
-
+		#TODO
+		#save graph and be able to open it in json
 	validateNetwork(network,input_var,validationSet)
 
-	saveModel(network=network,modelName='conv2Layer')
+	saveModel(network=network,modelName='testtrain')
 	pylab.plot(record['iteration'],record['error'], '-ro',label='TrErr')
 	pylab.plot(record['iteration'],record['accuracy'],'-go',label='TrAcc')
 	pylab.xlabel("Iteration")
