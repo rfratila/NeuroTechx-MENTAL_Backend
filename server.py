@@ -3,6 +3,7 @@ from graphing import *
 from pprint import pprint
 from bci_workshop_tools import *
 from DeepEEG import getState
+import subprocess
 
 app = Flask(__name__)
 person_name = ""
@@ -14,7 +15,7 @@ def hello():
 
 @app.route('/start')
 def start():
-    testrun()
+    subprocess.call("test.sh")
     return "Initializing"
 
 @app.route('/data', methods=['POST'])
@@ -41,6 +42,8 @@ def testjson():
 def registerPerson():
     person_name = form.data['name']
     time_interval = form.data['time_interval']
+    pprint("person_name is " + person_name)
+    pprint("time_interval is " + time_interval)
 
 @app.route('/callEEG')
 def callEEG():
