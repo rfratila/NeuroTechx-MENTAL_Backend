@@ -63,10 +63,17 @@ def createNetwork(dimensions, input_var):
 	#We have to specify the input size because of the dense layer
 	print ("Creating Network...")
 	dense=False
+	extraLayerswoutDSample = 0
 	network = lasagne.layers.InputLayer(shape=dimensions,input_var=input_var)
 	print ('Input Layer:')
 	print '	',lasagne.layers.get_output_shape(network)
 	print ('Hidden Layer:')
+
+	#extra layers if learning capacity is not reached. e.g the data is high-dimensional
+	for i in xrange(extraLayerswoutDSample):
+		network = lasagne.layers.Conv2DLayer(network, num_filters=15, filter_size=(5,5), pad ='same',nonlinearity=lasagne.nonlinearities.rectify)
+		print '	',lasagne.layers.get_output_shape(network)
+
 	if dense:
 		network = lasagne.layers.DenseLayer(network, num_units=1000, nonlinearity=lasagne.nonlinearities.rectify)
 		network = lasagne.layers.DropoutLayer(network,p=0.2)
@@ -87,7 +94,15 @@ def createNetwork(dimensions, input_var):
 		network = lasagne.layers.Conv2DLayer(network, num_filters=20, filter_size=(5,5), pad='same',nonlinearity=lasagne.nonlinearities.rectify)
 		network = lasagne.layers.MaxPool2DLayer(network,pool_size=(2, 2))
 		print '	',lasagne.layers.get_output_shape(network)
-		
+		'''
+		network = lasagne.layers.Conv2DLayer(network, num_filters=30, filter_size=(5,5), pad='same',nonlinearity=lasagne.nonlinearities.rectify)
+		network = lasagne.layers.MaxPool2DLayer(network,pool_size=(2, 2))
+		print '	',lasagne.layers.get_output_shape(network)
+		'''
+	#extra layers if learning capacity is not reached. e.g the data is high-dimensional
+	for i in xrange(extraLayerswoutDSample):
+		network = lasagne.layers.Conv2DLayer(network, num_filters=15, filter_size=(5,5), pad ='same',nonlinearity=lasagne.nonlinearities.rectify)
+		print '	',lasagne.layers.get_output_shape(network)	
 
 	network = lasagne.layers.DenseLayer(network, num_units=2, nonlinearity = lasagne.nonlinearities.softmax)
 	print ('Output Layer:')
@@ -113,7 +128,7 @@ def create3LayerNetwork(dimensions, input_var):
 	network = lasagne.layers.Conv2DLayer(network, num_filters=20, filter_size=(5,5), pad='same',nonlinearity=lasagne.nonlinearities.rectify)
 	network = lasagne.layers.MaxPool2DLayer(network,pool_size=(2, 2))
 	print '	',lasagne.layers.get_output_shape(network)
-		
+	
 	network = lasagne.layers.Conv2DLayer(network, num_filters=30, filter_size=(5,5), pad='same',nonlinearity=lasagne.nonlinearities.rectify)
 	network = lasagne.layers.MaxPool2DLayer(network,pool_size=(2, 2))
 	print '	',lasagne.layers.get_output_shape(network)
@@ -191,18 +206,45 @@ def validateNetwork(network,input_var,validationSet):
 
 #input: person_Name, timeIntervalBetweenSamples
 #output: json file with date,personName (YYYY/MM/DD/HH/DD)
-def getState(name,timeInterval,sample):
+def getState(name,timeInterval):
 	dataPath = os.path.join('data',name)
 	input_var = T.tensor4('input')
-	print "Loading sample..."%os.path.join(dataPath,sample)
-	inputDim = getJsonData(os.path.join(dataPath,sample))
+	
+	txtFile = open("%s/History.txt"%dataPath,'a')
+	txtFile.write(time.strftime("%c"))
+	txtFile.write('|')
+	txtFile.write(str(timeInterval))
+	txtFile.write('|')
+	txtFile.close()
+	#print "Loading sample..."%os.path.join(dataPath,'%s.json'%name)
+	data = getJsonData(os.path.join(dataPath,'%s.json'%name))
 
 	print ("Creating Network...")
-	networkDimensions = (1,1,inputDim['input'].shape[0],inputDim['input'].shape[1])
+	networkDimensions = (1,1,data['input'].shape[0],data['input'].shape[1])
 	network  = createNetwork(networkDimensions, input_var)
-	print 'loading a previously trained model...\n'
-	network = loadModel(network,'conv2Layer.npz')
-
+	print ('loading a previously trained model...\n')
+	network = loadModel(network,'Emily2Layer300000.npz')
+	out = lasagne.layers.get_output(network)
+	test_fn = theano.function([input_var],out)
+	try:
+		while(1):
+			data = getJsonData(os.path.join(dataPath,'%s.json'%name))
+			inputSample = data['input'].reshape([1,1] + list(data['input'].shape))
+			prediction = test_fn(inputSample)[0,0]
+			txtFile = open("%s/History.txt"%dataPath,'a')
+			txtFile.write(str(int(prediction)))
+			txtFile.close()
+			if prediction == 1:
+				print ("Prediction: Attentive") 
+			else:
+				print ("Prediction: Inattentive")
+			
+			time.sleep(timeInterval)
+	except KeyboardInterrupt:
+		txtFile = open("%s/History.txt"%dataPath,'a')
+		txtFile.write('\n')
+		txtFile.close()
+		print ("Printing to file")
 
 def main():
 	dataPath = 'data'
@@ -213,11 +255,11 @@ def main():
 	input_var = T.tensor4('input')
 	y = T.dmatrix('truth')
 
-	trainFromScratch = True
+	trainFromScratch = False
 	epochs = 10
 	samplesperEpoch = 10
-	trainTime = 2 #in hours
-	modelName='Emily2Layer300000'
+	trainTime = 0.01 #in hours
+	modelName='Blah'
 	dataSet = []
 
 	for patient in [dataPath]:
@@ -241,16 +283,13 @@ def main():
 	
 	networkDimensions = (1,1,inputDim['input'].shape[0],inputDim['input'].shape[1])
 	network  = createNetwork(networkDimensions, input_var)
-
-	
 	trainer = createTrainer(network,input_var,y)
 
-	
 	validator = createValidator(network,input_var,y)
 
 	if not trainFromScratch:
-		print 'loading a previously trained model...\n'
-		network = loadModel(network,'conv2Layer.npz')
+		print ('loading a previously trained model...\n')
+		network = loadModel(network,'Emily2Layer300000.npz')
 
 
 	#print ("Training for %s epochs with %s samples per epoch"%(epochs,samplesperEpoch))
@@ -283,62 +322,14 @@ def main():
 		print ("	error: %s and accuracy: %s in %.2fs\n"%(error,accuracy,epochTime))
 		epoch+=1
 
-	validateNetwork(network,input_var,validationSet)
+	#validateNetwork(network,input_var,validationSet)
 
-	saveModel(network=network,modelName=modelName)
-	#import pudb; pu.db
-	import pickle
-	#save metrics to json file to be opened later and displayed
-	with open('%sstats.pickle'%modelName,'w') as output:
-		#json.dump(dict(record),output)
-		pickle.dump(record,output)
-
-
-
+	#saveModel(network=network,modelName=modelName)
 	'''
-	modelName='Emily3Layer'
-	network  = create3LayerNetwork(networkDimensions, input_var)
-	trainer = createTrainer(network,input_var,y)
-	validator = createValidator(network,input_var,y)
-	#print ("Training for %s epochs with %s samples per epoch"%(epochs,samplesperEpoch))
-	record = OrderedDict(iteration=[],error=[],accuracy=[])
-
-	print ("Training for %s hour(s) with %s samples per epoch"%(trainTime,samplesperEpoch))
-	epoch = 0
-	startTime = time.time()
-	timeElapsed = time.time() - startTime
-	#for epoch in xrange(epochs):            #use for epoch training
-	while timeElapsed/3600 < trainTime :     #use for time training
-		epochTime = time.time()
-		print ("--> Epoch: %d | Time left: %.2f hour(s)"%(epoch,trainTime-timeElapsed/3600))
-		for i in xrange(samplesperEpoch):
-			chooseRandomly = numpy.random.randint(len(trainingSet))
-			data = getJsonData(trainingSet[chooseRandomly])
-			trainIn = data['input'].reshape([1,1] + list(data['input'].shape))
-			trainer(trainIn, data['truth'])
-
-		chooseRandomly = numpy.random.randint(len(testSet))
-		print ("Gathering data...%s"%testSet[chooseRandomly])
-		data = getJsonData(testSet[chooseRandomly])
-		trainIn = data['input'].reshape([1,1] + list(data['input'].shape))
-		error, accuracy = validator(trainIn, data['truth'])			     #pass modified data through network
-		record['error'].append(error)
-		record['accuracy'].append(accuracy)
-		record['iteration'].append(epoch)
-		timeElapsed = time.time() - startTime
-		epochTime = time.time() - epochTime
-		print ("	error: %s and accuracy: %s in %.2fs\n"%(error,accuracy,epochTime))
-		epoch+=1
-
-	validateNetwork(network,input_var,validationSet)
-
-	saveModel(network=network,modelName=modelName)
-	#import pudb; pu.db
-
 	#save metrics to json file to be opened later and displayed
-	with open('%sstats.pickle'%modelName,'w') as output:
-		#json.dump(dict(record),output)
-		pickle.dump(record,output)
+	data = {'data':record}
+	with open('%sstats.json'%modelName,'w') as output:
+		json.dump(data,output)
 	'''
 
-main()
+#main()
