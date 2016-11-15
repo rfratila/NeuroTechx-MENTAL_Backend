@@ -70,7 +70,8 @@ def lineGraphData():
 
 @app.route('/punchCard')
 def punchCard():
-    return
+    temp = {"session_start_time" : "Monday", "values": "0.3,0.1,0.2,0.7,0.4,0.6,0.33,0.9,0.8,0.1"}
+    return jsonify(temp)
 
 @app.route('/end')
 def end():
