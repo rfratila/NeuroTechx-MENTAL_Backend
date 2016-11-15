@@ -106,9 +106,10 @@ def readFile(name):
             lst = line.split("|")
             timestamp = lst[0]
             time_interval = lst[1]
-            brainStates = lst[2].split("")
-            history.append({"timestamp" : timestamp, "time_interval" : time_interval, "brainStates" : brainStates})
+            brainStates = list(lst[2])
+            history.append({"timestamp" : timestamp, "time_interval" : time_interval, "brainStates" : brainStates[:-1]})
     with open(name+".json",'w') as outfile:
-        json.dump({"result", history}, outfile)
+        json.dump({"result":history}, outfile)
+    
 if __name__ == "__main__":
     app.run(debug=True)
