@@ -258,8 +258,8 @@ def main():
 	trainFromScratch = False
 	epochs = 10
 	samplesperEpoch = 10
-	trainTime = 0.01 #in hours
-	modelName='Blah'
+	trainTime = 7 #in hours
+	modelName='Emily2LayerNew'
 	dataSet = []
 
 	for patient in [dataPath]:
@@ -322,14 +322,14 @@ def main():
 		print ("	error: %s and accuracy: %s in %.2fs\n"%(error,accuracy,epochTime))
 		epoch+=1
 
-	#validateNetwork(network,input_var,validationSet)
+	validateNetwork(network,input_var,validationSet)
 
-	#saveModel(network=network,modelName=modelName)
-	'''
-	#save metrics to json file to be opened later and displayed
+	saveModel(network=network,modelName=modelName)
+	
+	#save metrics to pickle file to be opened later and displayed
 	data = {'data':record}
 	with open('%sstats.json'%modelName,'w') as output:
 		json.dump(data,output)
-	'''
-
-#main()
+	
+if __name__ == "__main__":
+    main()
