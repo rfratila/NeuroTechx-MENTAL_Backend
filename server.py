@@ -9,6 +9,7 @@ from subprocess import Popen, PIPE, STDOUT, call, check_call
 
 app = Flask(__name__)
 person_name = ""
+attentive = 0
 time_interval = ""
 CORS(app)
 @app.route('/')
@@ -22,8 +23,12 @@ def login():
     person_name = temp['name']
     return jsonify({"name" : person_name})
 
-@app.route('/start')
+@app.route('/start', methods=['POST'])
 def start():
+    temp = request.get_json()
+    attentive_state = temp['attentive']
+    # attentive_state will be true / false 
+
 
     # dummy = "-p /dev/tty.usbserial-DB00J8RE --add abhi person Jake window_size 1 recording_session_number 12 attentive"
     # args_list = dummy.split(" ")
@@ -38,6 +43,11 @@ def start():
     # rc = p.poll()
     return "Initializing"
 
+@app.route('/focus')
+def focus():
+    # TODO: will be used for the actual focus session
+    return 
+
 @app.route('/data', methods=['POST'])
 def data():
     x = request.form['sample_number']
@@ -49,14 +59,19 @@ def data():
     process(8, li, delay)
     return ""
 
+@app.route('/lineGraphData')
+def lineGraphData():
+    return 
+
 @app.route('/end')
 def end():
     stop()
     return "Stop executed"
 
-@app.route('/testjson')
+@app.route('/polling')
 def testjson():
-    return jsonify({"first" : [1,2,3,4], "second" : {"test1" : "test2"}})
+    # attentive has a 0 or 1 
+    return jsonify({"result" : attentive })
 
 @app.route('/registerPerson', methods=['POST'])
 def registerPerson():
