@@ -15,6 +15,13 @@ CORS(app)
 def hello():
     return "Welcome to the local server"
 
+@app.route('/login', methods=['POST'])
+def login():
+    temp = request.get_json()
+    # TODO: create a file 
+    person_name = temp['name']
+    return jsonify({"name" : person_name})
+
 @app.route('/start')
 def start():
 
@@ -53,14 +60,9 @@ def testjson():
 
 @app.route('/registerPerson', methods=['POST'])
 def registerPerson():
-    pprint(request)
-    pprint(request.args)
-    pprint(request.form)
     temp = request.get_json()
     person_name = temp['name']
     time_interval = temp['time_interval']
-    pprint("person_name is " + person_name)
-    pprint("time_interval is "+ time_interval)
     return jsonify({"name" : person_name, "time_interval" : time_interval})
 
 @app.route('/callEEG')
