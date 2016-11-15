@@ -223,7 +223,7 @@ def getState(name,timeInterval):
 	networkDimensions = (1,1,data['input'].shape[0],data['input'].shape[1])
 	network  = createNetwork(networkDimensions, input_var)
 	print ('loading a previously trained model...\n')
-	network = loadModel(network,'Emily2Layer300000.npz')
+	network = loadModel(network,'networks/Emily2Layer300000.npz')
 	out = lasagne.layers.get_output(network)
 	test_fn = theano.function([input_var],out)
 	try:

@@ -9,7 +9,6 @@ modelName = "Emily2Layer300000stats.pickle"
 if len(sys.argv) > 1:
 	modelName = sys.argv[1]
 with open('%s'%modelName) as infile:
-	import pudb; pu.db
 	if '.pickle' in modelName:
 		data = pickle.load(infile)
 	elif '.json' in modelName:
