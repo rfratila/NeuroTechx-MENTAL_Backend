@@ -14,7 +14,8 @@ from yapsy.PluginManager import PluginManager
 manager = PluginManager()
 manager.setPluginPlaces(["plugins"])
 manager.collectPlugins()
-
+def giveBoard():
+    return "hello"
 if __name__ == '__main__':
 
     print ("            USER.py")
@@ -161,6 +162,8 @@ $$$ signals end of message")
     print("\n-------------BEGIN---------------")
     # Init board state
     # s: stop board streaming; v: soft reset of the 32-bit board (no effect with 8bit board)
+    def giveBoard():
+        return board
     s = 'sv'
     # Tell the board to enable or not daisy module
     if board.daisy:
