@@ -211,7 +211,7 @@ def getState(name,timeInterval):
 	input_var = T.tensor4('input')
 	
 	txtFile = open("%s/History.txt"%dataPath,'a')
-	txtFile.write(time.strftime("%c"))
+	txtFile.write(str(time.time()))#time.strftime("%c")
 	txtFile.write('|')
 	txtFile.write(str(timeInterval))
 	txtFile.write('|')
