@@ -5,6 +5,7 @@ from pprint import pprint
 # from bci_workshop_tools import *
 # from DeepEEG import getState
 from subprocess import Popen, PIPE, STDOUT, call, check_call
+import json
 # import user
 
 app = Flask(__name__)
@@ -29,23 +30,27 @@ def start():
     attentive_state = temp['attentive']
     # attentive_state will be true / false 
 
-
     # dummy = "-p /dev/tty.usbserial-DB00J8RE --add abhi person Jake window_size 1 recording_session_number 12 attentive"
     # args_list = dummy.split(" ")
     # p = Popen(["python", "user.py"] + args_list, stdout=PIPE, stdin=PIPE)
     # out, err = p.communicate()
 
     # p = Popen(["./start.sh"])
+    '''
     temp = "python user.py -p /dev/tty.usbserial-DB00J8RE --add abhi person Jake window_size 1 recording_session_number 12 attentive"
     p = Popen(temp.split(" "))
     board = user.giveBoard()
-
+    '''
     # rc = p.poll()
     return "Initializing"
 
-@app.route('/focus')
-def focus():
+@app.route('/startFocus')
+def startFocus():
     # TODO: will be used for the actual focus session
+    return 
+
+@app.route('/endFocus')
+def endFocus():
     return 
 
 @app.route('/data', methods=['POST'])
@@ -62,6 +67,10 @@ def data():
 @app.route('/lineGraphData')
 def lineGraphData():
     return 
+
+@app.route('/punchCard')
+def punchCard():
+    return
 
 @app.route('/end')
 def end():
@@ -85,5 +94,21 @@ def callEEG():
     # person_full_name, time_interval between samples
     getState(person_name, time_interval)
 
+@app.route('/readFile/<name>')
+def test(name):
+    readFile(name)
+    return "done"
+
+def readFile(name):
+    history = []
+    with open(name+".txt") as f:
+        for line in f:
+            lst = line.split("|")
+            timestamp = lst[0]
+            time_interval = lst[1]
+            brainStates = lst[2].split("")
+            history.append({"timestamp" : timestamp, "time_interval" : time_interval, "brainStates" : brainStates})
+    with open(name+".json",'w') as outfile:
+        json.dump({"result", history}, outfile)
 if __name__ == "__main__":
     app.run(debug=True)
