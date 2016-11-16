@@ -248,7 +248,8 @@ https://github.com/OpenBCI/OpenBCI_Python")
 
         # Take user input
         #s = input('--> ')
-        if sys.hexversion > 0x03000000:
-            s = input('--> ')
-        else:
-            s = raw_input('--> ')
+        # if sys.hexversion > 0x03000000:
+        #     s = input('--> ')
+        # else:
+        #     s = raw_input('--> ')
+        s = sys.stdin.readline()

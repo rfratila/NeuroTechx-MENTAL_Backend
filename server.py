@@ -5,7 +5,7 @@ from pprint import pprint
 # from bci_workshop_tools import *
 # from DeepEEG import getState
 from subprocess import Popen, PIPE, STDOUT, call, check_call
-import json
+import json, time, sys
 # import user
 
 app = Flask(__name__)
@@ -32,8 +32,13 @@ def start():
 
     # dummy = "-p /dev/tty.usbserial-DB00J8RE --add abhi person Jake window_size 1 recording_session_number 12 attentive"
     # args_list = dummy.split(" ")
-    # p = Popen(["python", "user.py"] + args_list, stdout=PIPE, stdin=PIPE)
-    # out, err = p.communicate()
+    # p = Popen(["python", "user.py"] + args_list, stdin=PIPE, stdout=PIPE)
+    # time.sleep(20)
+    # pid = p.pid
+    call(["./start.sh"])
+    # out, err = p.communicate(input=b'/start')
+    
+    
 
     # p = Popen(["./start.sh"])
     '''
