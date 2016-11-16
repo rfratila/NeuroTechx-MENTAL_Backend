@@ -80,7 +80,7 @@ def punchCard():
 
 @app.route('/end')
 def end():
-    stop()
+
     return "Stop executed"
 
 @app.route('/polling')
@@ -118,4 +118,4 @@ def readFile(name):
         json.dump({"result":history}, outfile)
     
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, threaded=True)

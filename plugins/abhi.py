@@ -19,7 +19,7 @@ from pprint import pprint
 # import numpy as np
 import plugin_interface as plugintypes
 import requests
-import sys
+import sys, os, signal
 
 class PluginAbhi(plugintypes.IPluginExtended):
     def __init__(self, delim = ",", verbose=False, train=False, acquire=False, person="Typhlosion", url='http://127.0.0.1:5000/', graph=False, recording_session_number=0, window_size=10, attentive=False):
@@ -183,7 +183,8 @@ class PluginAbhi(plugintypes.IPluginExtended):
         self.sample_numbers += 1
         if self.sample_numbers > self.window_size:
             pprint(str(self.sample_numbers-1) + " samples have been collected, please type in /stop to finish")
-            sys.exit()
+            # sys.exit()
+            os.kill(os.getpid(), signal.SIGINT)
             #TODO add code to auto exit the entire plugin 
 
         #print timeSinceStart|Sample Id
