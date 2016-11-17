@@ -49,7 +49,7 @@ def start():
     # rc = p.poll()
     return "Initializing"
 
-@app.route('/startFocus')
+@app.route('/startFocus', methods=['POST'])
 def startFocus():
     # TODO: will be used for the actual focus session
     return 
