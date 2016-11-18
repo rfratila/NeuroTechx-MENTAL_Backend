@@ -52,11 +52,11 @@ def start():
 @app.route('/startFocus', methods=['POST'])
 def startFocus():
     # TODO: will be used for the actual focus session
-    return 
+    return ""
 
 @app.route('/endFocus')
 def endFocus():
-    return 
+    return ""
 
 @app.route('/data', methods=['POST'])
 def data():
@@ -71,7 +71,7 @@ def data():
 
 @app.route('/lineGraphData')
 def lineGraphData():
-    return 
+    return ""
 
 @app.route('/punchCard')
 def punchCard():
@@ -98,12 +98,18 @@ def registerPerson():
 @app.route('/callEEG')
 def callEEG():
     # person_full_name, time_interval between samples
-    getState(person_name, time_interval)
+    # getState(person_name, time_interval)
+    return ""
 
 @app.route('/readFile/<name>')
 def test(name):
     readFile(name)
     return "done"
+
+@app.route('/pieChart')
+def pieChart():
+    # return percentage of attentive and inattentive
+    return jsonify({"attentive" : 10, "inattentive" : 90})
 
 def readFile(name):
     history = []
