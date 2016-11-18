@@ -71,11 +71,14 @@ def data():
 
 @app.route('/lineGraphData')
 def lineGraphData():
-    return ""
+    temp = {"data" : [ {"session_start_time" : "Monday", "values": "0.4,0.1,0.2,0.75,0.4,0.6,0.33,0.9,0.8,0.1"}, {"session_start_time" : "Tuesday", "values": "0.3,0.1,0.2,0.7,0.4,0.4,0.33,0.2,0.8,0.1"}, {"session_start_time" : "Wednesday", "values": "0.9,0.1,0.2,0.4,0.1,0.6,0.33,0.9,0.7,0.1"}, {"session_start_time" : "Thursday", "values": "0.15,0.1,0.2,0.7,0.4,0.6,0.11,0.9,0.8,0.1"} ] }
+    return jsonify(temp)
 
 @app.route('/punchCard')
 def punchCard():
-    temp = {"session_start_time" : "Monday", "values": "0.3,0.1,0.2,0.7,0.4,0.6,0.33,0.9,0.8,0.1"}
+    # temp = {"session_start_time" : "Monday", "values": "0.3,0.1,0.2,0.7,0.4,0.6,0.33,0.9,0.8,0.1"}
+    # with open(person_name+)
+    temp = {"result" : "true"}
     return jsonify(temp)
 
 @app.route('/end')
