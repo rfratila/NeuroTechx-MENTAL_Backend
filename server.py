@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, redirect, url_for
 from flask_cors import CORS
 # from graphing import *
 from pprint import pprint
@@ -81,24 +81,24 @@ def triggerTraining():
 @app.route('/startFocus')
 def startFocus():
     '''
-      loop to call /start
+    loop to call /start
       if elapsed time less than duration time 
       call start , "focus"
       if first_recording
         callEEG
         first_recording =  False 
       '''
-      temp = request.get_json()
-      focus_duration = temp['focus_duration'] # 30 seconds for the demo
-      sub_sample_duration = 5 
-      time_elapsed = 0
-      while(time_elapsed<focus_duration):
-          time_elapsed += sub_sample_duration
-          # call the start endpoint and pass it sub_sample_duration
-          if first_recording:
-              callEEG(sub_sample_duration, focus_duration)
-              first_recording = False
-      return 
+    temp = request.get_json()
+    focus_duration = temp['focus_duration'] # 30 seconds for the demo
+    sub_sample_duration = 5 
+    time_elapsed = 0
+    while(time_elapsed<focus_duration):
+        time_elapsed += sub_sample_duration
+        redirect(url_for('start'), code=307)
+        if first_recording:
+            callEEG(sub_sample_duration, focus_duration)
+            first_recording = False
+    return 
 
 @app.route('/endFocus')
 def endFocus():
@@ -162,7 +162,7 @@ def test():
             time_interval = lst[1]
             brainStates = list(lst[2])
             history.append({"timestamp" : timestamp, "time_interval" : time_interval, "brainStates" : brainStates[:-1]})
-    with open("./data/"+ person_name+".json",'w') as outfile:
+    with open("./data/"+ person_name+"/"+person_name+".json",'w') as outfile:
         json.dump({"result":history}, outfile)
     return "done"
 
