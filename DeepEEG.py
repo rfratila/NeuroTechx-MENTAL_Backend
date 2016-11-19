@@ -209,7 +209,7 @@ def validateNetwork(network,input_var,validationSet):
 def getState(name,timeInterval,recordDuration):
 	dataPath = os.path.join('data',name)
 	input_var = T.tensor4('input')
-	
+	timeDelay = 3 #time to start up bci tool in seconds
 	txtFile = open("%s/History.txt"%dataPath,'a')
 	txtFile.write(str(time.time()))#time.strftime("%c")
 	txtFile.write('|')
@@ -241,7 +241,11 @@ def getState(name,timeInterval,recordDuration):
 			else:
 				print ("Prediction: Inattentive")
 			
-			time.sleep(timeInterval)
+			time.sleep(timeInterval + timeDelay)
+		txtFile = open("%s/History.txt"%dataPath,'a')
+		txtFile.write('\n')
+		txtFile.close()
+		print ("Printing to file")
 	except KeyboardInterrupt:
 		txtFile = open("%s/History.txt"%dataPath,'a')
 		txtFile.write('\n')
@@ -260,7 +264,7 @@ def main():
 	trainFromScratch = False
 	epochs = 10
 	samplesperEpoch = 10
-	trainTime = .1 #in hours
+	trainTime = 0.01 #in hours
 	modelName='Emily2LayerNew'
 	dataSet = []
 
@@ -291,7 +295,7 @@ def main():
 
 	if not trainFromScratch:
 		print ('loading a previously trained model...\n')
-		network = loadModel(network,'Emily2LayerNew.npz')
+		network = loadModel(network,'Emily2Layer300000.npz')
 
 
 	#print ("Training for %s epochs with %s samples per epoch"%(epochs,samplesperEpoch))
@@ -327,11 +331,12 @@ def main():
 	validateNetwork(network,input_var,validationSet)
 
 	saveModel(network=network,modelName=modelName)
-	
+	#import pudb; pu.db
 	#save metrics to pickle file to be opened later and displayed
 	import pickle
 	data = {'data':record}
 	with open('%sstats.json'%modelName,'w') as output:
+		import pudb; pu.db
 		pickle.dump(data,output)
 	
 if __name__ == "__main__":

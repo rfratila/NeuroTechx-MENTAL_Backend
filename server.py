@@ -97,7 +97,7 @@ def startFocus():
 
     global first_recording
     temp = request.get_json()
-    focus_duration = temp['focus_duration'] # 30 seconds for the demo
+    focus_duration = 30#temp['focus_duration'] # 30 seconds for the demo
     sub_sample_duration = 5 
     time_elapsed = 0
     data = {"attentive": "focus"}
