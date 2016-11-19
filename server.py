@@ -3,11 +3,13 @@ from flask_cors import CORS
 # from graphing import *
 from pprint import pprint
 # from bci_workshop_tools import *
-# from DeepEEG import getState
+from DeepEEG import getState
 from subprocess import Popen, PIPE, STDOUT, call, check_call
 import json, time, sys
 # import user
 import os
+import requests
+import thread
 
 app = Flask(__name__)
 person_name = ""
@@ -50,10 +52,11 @@ def start(sub_sample_duration=0):
     # elif "focus" in attentive_state:
     #     fileName = os.join(fileName,'%s/'%person_name)
     
-    
 
     global person_name
-    dummy = "-p /dev/tty.usbserial-DB00J8RE --add abhi person " + person_name +" " +attentive_state + " duration " + duration_value
+    #dummy = "-p /dev/tty.usbserial-DB00J8RE --add abhi person " + person_name +attentive_state + " duration " + duration_value
+    dummy = "-p /dev/ttyUSB0 --add abhi person " + person_name +" " + attentive_state + " duration " + duration_value
+
    
     # dummy = "-p /dev/tty.usbserial-DB00J8RE --add abhi person Jake window_size 1 recording_session_number 12 attentive"
     # args_list = dummy.split(" ")
@@ -91,16 +94,19 @@ def startFocus():
         callEEG
         first_recording =  False 
       '''
+
     global first_recording
     temp = request.get_json()
     focus_duration = temp['focus_duration'] # 30 seconds for the demo
     sub_sample_duration = 5 
     time_elapsed = 0
+    data = {"attentive": "focus"}
+
     while(time_elapsed<focus_duration):
         time_elapsed += sub_sample_duration
-        redirect(url_for('start'), code=307)
+        r = requests.post("http://127.0.0.1:5000/start",json=data)
         if first_recording:
-            callEEG(sub_sample_duration, focus_duration)
+            thread.start_new_thread(callEEG, (sub_sample_duration, focus_duration))
             first_recording = False
     return ""
 
