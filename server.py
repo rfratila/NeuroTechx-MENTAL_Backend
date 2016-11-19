@@ -11,6 +11,7 @@ import os
 
 app = Flask(__name__)
 person_name = ""
+first_recording = True
 attentive = 0
 time_interval = ""
 CORS(app)
@@ -27,12 +28,13 @@ def login():
     return jsonify({"name" : person_name})
 
 @app.route('/start', methods=['POST'])
-def start():
+def start(sub_sample_duration=0):
     temp = request.get_json()
     attentive_state = temp['attentive']
     # attentive_state will be true / false / focus
-    
-
+    duration_value = "15" # for the demo it is for training
+    if attentive_state is "focus":
+        duration_value = sub_sample_duration
     # attentive_state will be true / false 
     if attentive_state is "true":
         attentive_state = "attentive"
@@ -43,14 +45,15 @@ def start():
     if "true" in attentive_state:
         fileName = os.join(fileName,'attentive/%s'%person_name)
     elif "false" in attentive_state:
-        fileName = os.join(fileName,'attentive/%s'%person_name)
+        fileName = os.join(fileName,'inattentive/%s'%person_name)
     elif "focus" in attentive_state:
         fileName = os.join(fileName,'%s/'%person_name)
+    
+    
 
     global person_name
-    dummy = "-p /dev/tty.usbserial-DB00J8RE --add abhi person " + person_name + " recording_session_number 1 " +attentive_state + " duration " + "15"
-    # duration = 60 seconds 
-
+    dummy = "-p /dev/tty.usbserial-DB00J8RE --add abhi person " + person_name +attentive_state + " duration " + duration_value
+   
     # dummy = "-p /dev/tty.usbserial-DB00J8RE --add abhi person Jake window_size 1 recording_session_number 12 attentive"
     # args_list = dummy.split(" ")
     # p = Popen(["python", "user.py"] + args_list, stdin=PIPE, stdout=PIPE)
@@ -74,6 +77,28 @@ def start():
 def triggerTraining():
     call(["python","DeepEEG.py"])
     return "Done running"
+
+@app.route('/startFocus')
+def startFocus():
+    '''
+      loop to call /start
+      if elapsed time less than duration time 
+      call start , "focus"
+      if first_recording
+        callEEG
+        first_recording =  False 
+      '''
+      temp = request.get_json()
+      focus_duration = temp['focus_duration'] # 30 seconds for the demo
+      sub_sample_duration = 5 
+      time_elapsed = 0
+      while(time_elapsed<focus_duration):
+          time_elapsed += sub_sample_duration
+          # call the start endpoint and pass it sub_sample_duration
+          if first_recording:
+              callEEG(sub_sample_duration, focus_duration)
+              first_recording = False
+      return 
 
 @app.route('/endFocus')
 def endFocus():
@@ -115,16 +140,15 @@ def testjson():
 @app.route('/registerPerson', methods=['POST'])
 def registerPerson():
     temp = request.get_json()
-    global person_name 
-    person_name = temp['name']
+    global time_interval
     time_interval = temp['time_interval']
     return jsonify({"name" : person_name, "time_interval" : time_interval})
 
-@app.route('/callEEG')
-def callEEG():
+def callEEG(sub_sample_duration, focus_duration):
     # person_full_name, time_interval between samples
-    # getState(person_name, time_interval)
-    return ""
+    global person_name
+    getState(person_name, sub_sample_duration, focus_duration)
+    return "done"
 
 @app.route('/readFile')
 def test():
@@ -146,21 +170,6 @@ def test():
 def pieChart():
     # return percentage of attentive and inattentive
     return jsonify({"attentive" : 10, "inattentive" : 90})
-
-def readFile():
-
-    history = []
-    global person_name
-    with open("./data/"+person_name+"/History.txt") as f:
-        for line in f:
-            lst = line.split("|")
-            timestamp = lst[0]
-            time_interval = lst[1]
-            brainStates = list(lst[2])
-            history.append({"timestamp" : timestamp, "time_interval" : time_interval, "brainStates" : brainStates[:-1]})
-    with open("./data/"+ person_name+".json",'w') as outfile:
-        json.dump({"result":history}, outfile)
-    return "done"
     
 if __name__ == "__main__":
     app.run(debug=True, threaded=True)
