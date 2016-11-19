@@ -3,7 +3,7 @@ from flask_cors import CORS
 # from graphing import *
 from pprint import pprint
 # from bci_workshop_tools import *
-# from DeepEEG import getState
+from DeepEEG import getState
 from subprocess import Popen, PIPE, STDOUT, call, check_call
 import json, time, sys
 # import user
@@ -99,7 +99,7 @@ def startFocus():
         if first_recording:
             callEEG(sub_sample_duration, focus_duration)
             first_recording = False
-    return 
+    return ""
 
 @app.route('/endFocus')
 def endFocus():
