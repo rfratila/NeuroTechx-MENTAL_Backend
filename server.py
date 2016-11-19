@@ -78,7 +78,7 @@ def triggerTraining():
     call(["python","DeepEEG.py"])
     return "Done running"
 
-@app.route('/startFocus')
+@app.route('/startFocus', methods=['POST'])
 def startFocus():
     '''
     loop to call /start
