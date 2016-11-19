@@ -9,7 +9,7 @@ import json, time, sys
 # import user
 import os
 import requests
-import thread
+import thread, csv
 
 app = Flask(__name__)
 person_name = ""
@@ -133,10 +133,31 @@ def lineGraphData():
 
 @app.route('/punchCard')
 def punchCard():
-    # temp = {"session_start_time" : "Monday", "values": "0.3,0.1,0.2,0.7,0.4,0.6,0.33,0.9,0.8,0.1"}
-    # with open(person_name+)
-    temp = {"result" : "true"}
-    return jsonify(temp)
+    with open("./data/"+ person_name+"/"+person_name+".json") as infile: 
+        temp = json.load(infile)
+    res = temp['result']
+    states = []
+    for r in res:
+        bs = r['brainStates']
+        for b in bs:
+            states.append(int(b))
+    att_count = 0
+    inatt_count = 0
+    total = 0
+    for s in states:
+        if (int)(s) == 0:
+            inatt_count += 1
+        else:
+            att_count +=1 
+        total += 1
+    interval = (int)(total/10)
+    vals = []
+    for i in range(0,len(states)):
+        a = 0
+        for j in range(i, i+interval):
+            a+=states[j]
+        vals.append((float)(a)/interval)
+    return jsonify({"result" : "done"}})
 
 @app.route('/end')
 def end():
@@ -192,18 +213,12 @@ def pieChart():
     att_count = 0
     inatt_count = 0
     total = 0
-    pprint(states)
     for s in states:
         if (int)(s) == 0:
             inatt_count += 1
         else:
             att_count +=1 
         total += 1
-    pprint(total)
-    pprint(att_count)
-    pprint(inatt_count)
-    pprint((float(att_count)/total)*100)
-    pprint((float(inatt_count)/total)*100  )
     return jsonify({"attentive" : (att_count/total)*100, "inattentive" : (inatt_count/total)*100})
     
 if __name__ == "__main__":
