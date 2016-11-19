@@ -22,7 +22,7 @@ import requests
 import sys, os, signal
 
 class PluginAbhi(plugintypes.IPluginExtended):
-    def __init__(self, delim = ",", verbose=False, train=False, acquire=False, person="Typhlosion", url='http://127.0.0.1:5000/', graph=False, recording_session_number=0, window_size=10, attentive=False):
+    def __init__(self, delim = ",", verbose=False, train=False, acquire=False, person="Typhlosion", url='http://127.0.0.1:5000/', graph=False, recording_session_number=0, window_size=10, attentive=False, duration=1):
         now = datetime.datetime.now()
         self.time_stamp = '%d-%d-%d_%d-%d-%d'%(now.year,now.month,now.day,now.hour,now.minute,now.second)
         self.file_name = self.time_stamp
@@ -43,6 +43,7 @@ class PluginAbhi(plugintypes.IPluginExtended):
         self.attentive = attentive
         self.first_call = True
         self.record_start_time = 0
+        self.duration = duration
         
     def activate(self):
         if self.graph:
@@ -62,6 +63,13 @@ class PluginAbhi(plugintypes.IPluginExtended):
                 self.graph = True
             if 'attentive' in self.args:
                 self.attentive = True
+            if 'duration' in self.args:
+                for x in range(0,len(self.args)):
+                    if self.args[x]=='duration':
+                            try:
+                                self.duration = (int)(self.args[x+1])
+                            except:
+                                self.duration = "Not assigned"
             if 'person' in self.args:
                 for x in range(0,len(self.args)):
                     if self.args[x]=='person':
@@ -86,6 +94,12 @@ class PluginAbhi(plugintypes.IPluginExtended):
                                 self.recording_session_number = "Not assigned"
 
         self.file_name = self.file_name + '.csv'
+        # the decimal number is the approximate time between each sample
+        pprint("duration is " + str(self.duration))
+        self.window_size = (int)(self.duration/0.00014901161193847656)
+        # dividing by 30 because sampling rate doesn't match '
+        self.window_size = self.window_size/30
+        pprint("the window_size is " + str(self.window_size))
         # print "Will export CSV to:", self.file_name
         #Open in append mode
         # with open(self.file_name, 'a') as f:
@@ -181,11 +195,12 @@ class PluginAbhi(plugintypes.IPluginExtended):
         Code below to limit the number of samples collected 
         '''
         self.sample_numbers += 1
+        # pprint(self.sample_numbers)
         if self.sample_numbers > self.window_size:
             pprint(str(self.sample_numbers-1) + " samples have been collected, please type in /stop to finish")
             # sys.exit()
             os.kill(os.getpid(), signal.SIGINT)
-            #TODO add code to auto exit the entire plugin 
+            # TODO add code to auto exit the entire plugin 
 
         #print timeSinceStart|Sample Id
         # if self.verbose:

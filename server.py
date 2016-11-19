@@ -124,9 +124,9 @@ def callEEG():
     # getState(person_name, time_interval)
     return ""
 
-@app.route('/readFile/<name>')
-def test(name):
-    readFile(name)
+@app.route('/readFile')
+def test():
+    readFile()
     return "done"
 
 @app.route('/pieChart')
@@ -134,16 +134,16 @@ def pieChart():
     # return percentage of attentive and inattentive
     return jsonify({"attentive" : 10, "inattentive" : 90})
 
-def readFile(name):
+def readFile():
     history = []
-    with open(name+".txt") as f:
+    with open("./data/"+person_name+"/History.txt") as f:
         for line in f:
             lst = line.split("|")
             timestamp = lst[0]
             time_interval = lst[1]
             brainStates = list(lst[2])
             history.append({"timestamp" : timestamp, "time_interval" : time_interval, "brainStates" : brainStates[:-1]})
-    with open(name+".json",'w') as outfile:
+    with open("./data/"+person_name+".json",'w') as outfile:
         json.dump({"result":history}, outfile)
     
 if __name__ == "__main__":
