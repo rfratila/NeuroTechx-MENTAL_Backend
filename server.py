@@ -29,13 +29,21 @@ def start():
     temp = request.get_json()
     attentive_state = temp['attentive']
     # attentive_state will be true / false 
+    
+    if attentive_state is "true":
+        attentive_state = "attentive"
+    else:
+        attentive_state = ""
+
+    dummy = "-p /dev/tty.usbserial-DB00J8RE --add abhi person " + person_name + " recording_session_number 1 " +attentive_state + " duration " + "60"
+    # duration = 60 seconds 
 
     # dummy = "-p /dev/tty.usbserial-DB00J8RE --add abhi person Jake window_size 1 recording_session_number 12 attentive"
     # args_list = dummy.split(" ")
     # p = Popen(["python", "user.py"] + args_list, stdin=PIPE, stdout=PIPE)
     # time.sleep(20)
     # pid = p.pid
-    call(["./start.sh"])
+    call(["./start.sh", dummy])
     # out, err = p.communicate(input=b'/start')
     
     
@@ -71,7 +79,7 @@ def data():
 
 @app.route('/lineGraphData')
 def lineGraphData():
-    temp = {"data" : [ {"session_start_time" : "Monday", "values": "0.4,0.1,0.2,0.75,0.4,0.6,0.33,0.9,0.8,0.1"}, {"session_start_time" : "Tuesday", "values": "0.3,0.1,0.2,0.7,0.4,0.4,0.33,0.2,0.8,0.1"}, {"session_start_time" : "Wednesday", "values": "0.9,0.1,0.2,0.4,0.1,0.6,0.33,0.9,0.7,0.1"}, {"session_start_time" : "Thursday", "values": "0.15,0.1,0.2,0.7,0.4,0.6,0.11,0.9,0.8,0.1"} ] }
+    temp = { "data": [{ "label": "apples", "data": [12, 19, 3, 17, 6, 3, 7], "backgroundColor": "rgba(153,255,51,0.4)" }, { "label": "oranges", "data": [2, 29, 5, 5, 2, 3, 10], "backgroundColor": "rgba(400,153,0,0.4)" }, { "label": "banana", "data": [12, 19, 3, 17, 6, 3, 7], "backgroundColor": "rgba(153,255,51,0.4)" }, { "label": "pineapple", "data": [12, 19, 3, 17, 6, 3, 7], "backgroundColor": "rgba(500,255,51,0.4)" }, { "label": "hello", "data": [12, 19, 3, 17, 6, 3, 7], "backgroundColor": "rgba(153,255,51,0.4)" }] }
     return jsonify(temp)
 
 @app.route('/punchCard')
