@@ -44,6 +44,7 @@ class PluginAbhi(plugintypes.IPluginExtended):
         self.first_call = True
         self.record_start_time = 0
         self.duration = duration
+        self.focus = False
         
     def activate(self):
         if self.graph:
@@ -63,6 +64,8 @@ class PluginAbhi(plugintypes.IPluginExtended):
                 self.graph = True
             if 'attentive' in self.args:
                 self.attentive = True
+            if "focus" in self.args:
+                self.focus = True
             if 'duration' in self.args:
                 for x in range(0,len(self.args)):
                     if self.args[x]=='duration':
@@ -112,7 +115,8 @@ class PluginAbhi(plugintypes.IPluginExtended):
             r = requests.get(self.url+'end') #server
         data = {"data" : self.training_set, "sample_rate" : self.sample_numbers/recording_time}
         att_folder = 'inattentive'
-        
+        if self.focus:
+            att_folder = self.person
         if self.attentive:
             att_folder = 'attentive'
         with open("data/"+att_folder+"/"+self.person+"_"+str(self.recording_session_number)+'.json','w') as outfile:
