@@ -14,6 +14,7 @@ person_name = ""
 first_recording = True
 attentive = 0
 time_interval = ""
+counter = 0
 CORS(app)
 @app.route('/')
 def hello():
@@ -59,10 +60,12 @@ def start(sub_sample_duration=0):
     # p = Popen(["python", "user.py"] + args_list, stdin=PIPE, stdout=PIPE)
     # time.sleep(20)
     # pid = p.pid
-    #call(["./start.sh", dummy])
+    call(["./start.sh", dummy])
     # out, err = p.communicate(input=b'/start')
     
-    
+    global counter 
+    pprint("counter is " + str(counter))
+    counter +=1
 
     # p = Popen(["./start.sh"])
     '''
