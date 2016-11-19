@@ -192,14 +192,18 @@ def pieChart():
     att_count = 0
     inatt_count = 0
     total = 0
+    pprint(states)
     for s in states:
         if (int)(s) == 0:
             inatt_count += 1
         else:
             att_count +=1 
         total += 1
-    
-        
+    pprint(total)
+    pprint(att_count)
+    pprint(inatt_count)
+    pprint((float(att_count)/total)*100)
+    pprint((float(inatt_count)/total)*100  )
     return jsonify({"attentive" : (att_count/total)*100, "inattentive" : (inatt_count/total)*100})
     
 if __name__ == "__main__":
