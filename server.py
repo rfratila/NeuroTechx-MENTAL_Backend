@@ -7,6 +7,7 @@ from pprint import pprint
 from subprocess import Popen, PIPE, STDOUT, call, check_call
 import json, time, sys
 # import user
+import os
 
 app = Flask(__name__)
 person_name = ""
@@ -35,7 +36,13 @@ def start():
     else:
         attentive_state = ""
 
-    dummy = "-p /dev/tty.usbserial-DB00J8RE --add abhi person " + person_name + " recording_session_number 1 " +attentive_state + " duration " + "15"
+    fileName = 'data/'
+    if "true" in attentive_state:
+        fileName = os.join(fileName,'attentive/%s'person_name)
+    elif "false" in attentive_state
+    import pudb; pu.db
+    dummy = "-p /dev/tty.usbserial-DB00J8RE --add abhi person " + person_name + " recording_session_number 1 " +attentive_state + " duration " + "60"
+
     # duration = 60 seconds 
 
     # dummy = "-p /dev/tty.usbserial-DB00J8RE --add abhi person Jake window_size 1 recording_session_number 12 attentive"

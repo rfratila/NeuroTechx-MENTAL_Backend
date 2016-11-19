@@ -258,7 +258,7 @@ def main():
 	trainFromScratch = False
 	epochs = 10
 	samplesperEpoch = 10
-	trainTime = 7 #in hours
+	trainTime = .1 #in hours
 	modelName='Emily2LayerNew'
 	dataSet = []
 
@@ -289,7 +289,7 @@ def main():
 
 	if not trainFromScratch:
 		print ('loading a previously trained model...\n')
-		network = loadModel(network,'Emily2Layer300000.npz')
+		network = loadModel(network,'Emily2LayerNew.npz')
 
 
 	#print ("Training for %s epochs with %s samples per epoch"%(epochs,samplesperEpoch))
@@ -327,9 +327,10 @@ def main():
 	saveModel(network=network,modelName=modelName)
 	
 	#save metrics to pickle file to be opened later and displayed
+	import pickle
 	data = {'data':record}
 	with open('%sstats.json'%modelName,'w') as output:
-		json.dump(data,output)
+		pickle.dump(data,output)
 	
 if __name__ == "__main__":
     main()
