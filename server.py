@@ -32,16 +32,20 @@ def start():
     attentive_state = temp['attentive']
     # attentive_state will be true / false / focus
     
+
+    # attentive_state will be true / false 
     if attentive_state is "true":
         attentive_state = "attentive"
-    else:
+    elif attentive_state is "false":
         attentive_state = ""
 
     fileName = 'data/'
     if "true" in attentive_state:
-        fileName = os.join(fileName,'attentive/%s'person_name)
-    elif "false" in attentive_state
-    import pudb; pu.db
+        fileName = os.join(fileName,'attentive/%s'%person_name)
+    elif "false" in attentive_state:
+        fileName = os.join(fileName,'attentive/%s'%person_name)
+    elif "focus" in attentive_state:
+        fileName = os.join(fileName,'%s/'%person_name)
 
     global person_name
     dummy = "-p /dev/tty.usbserial-DB00J8RE --add abhi person " + person_name + " recording_session_number 1 " +attentive_state + " duration " + "15"
@@ -52,7 +56,7 @@ def start():
     # p = Popen(["python", "user.py"] + args_list, stdin=PIPE, stdout=PIPE)
     # time.sleep(20)
     # pid = p.pid
-    call(["./start.sh", dummy])
+    #call(["./start.sh", dummy])
     # out, err = p.communicate(input=b'/start')
     
     
@@ -124,6 +128,7 @@ def callEEG():
 
 @app.route('/readFile')
 def test():
+    
     history = []
     global person_name
     with open("./data/"+person_name+"/History.txt") as f:
@@ -142,6 +147,20 @@ def pieChart():
     # return percentage of attentive and inattentive
     return jsonify({"attentive" : 10, "inattentive" : 90})
 
+def readFile():
+
+    history = []
+    global person_name
+    with open("./data/"+person_name+"/History.txt") as f:
+        for line in f:
+            lst = line.split("|")
+            timestamp = lst[0]
+            time_interval = lst[1]
+            brainStates = list(lst[2])
+            history.append({"timestamp" : timestamp, "time_interval" : time_interval, "brainStates" : brainStates[:-1]})
+    with open("./data/"+ person_name+".json",'w') as outfile:
+        json.dump({"result":history}, outfile)
+    return "done"
     
 if __name__ == "__main__":
     app.run(debug=True, threaded=True)
