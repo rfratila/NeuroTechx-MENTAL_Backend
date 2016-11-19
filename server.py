@@ -54,8 +54,9 @@ def start(sub_sample_duration=0):
     
 
     global person_name
+    pprint("person_name is " + person_name)
     #dummy = "-p /dev/tty.usbserial-DB00J8RE --add abhi person " + person_name +attentive_state + " duration " + duration_value
-    dummy = "-p /dev/ttyUSB0 --add abhi person " + person_name + " duration " + duration_value + " " +attentive_state
+    dummy = "-p /dev/ttyUSB0 --add abhi person " + person_name + " duration " + duration_value + " "+attentive_state
 
    
     # dummy = "-p /dev/tty.usbserial-DB00J8RE --add abhi person Jake window_size 1 recording_session_number 12 attentive"
@@ -179,6 +180,7 @@ def test():
 @app.route('/pieChart')
 def pieChart():
     # return percentage of attentive and inattentive
+
     return jsonify({"attentive" : 10, "inattentive" : 90})
     
 if __name__ == "__main__":
