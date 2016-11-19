@@ -206,7 +206,7 @@ def validateNetwork(network,input_var,validationSet):
 
 #input: person_Name, timeIntervalBetweenSamples
 #output: json file with date,personName (YYYY/MM/DD/HH/DD)
-def getState(name,timeInterval):
+def getState(name,timeInterval,recordDuration):
 	dataPath = os.path.join('data',name)
 	input_var = T.tensor4('input')
 	
@@ -227,7 +227,9 @@ def getState(name,timeInterval):
 	out = lasagne.layers.get_output(network)
 	test_fn = theano.function([input_var],out)
 	try:
-		while(1):
+		timeElapsed = 0
+		while(timeElapsed<recordDuration):
+			timeElapsed+=timeInterval
 			data = getJsonData(os.path.join(dataPath,'%s.json'%name))
 			inputSample = data['input'].reshape([1,1] + list(data['input'].shape))
 			prediction = test_fn(inputSample)[0,0]
