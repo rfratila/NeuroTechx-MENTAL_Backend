@@ -180,8 +180,27 @@ def test():
 @app.route('/pieChart')
 def pieChart():
     # return percentage of attentive and inattentive
-
-    return jsonify({"attentive" : 10, "inattentive" : 90})
+    temp = {}
+    with open("./data/"+ person_name+"/"+person_name+".json") as infile: 
+        temp = json.load(infile)
+    res = temp['result']
+    states = []
+    for r in res:
+        bs = r['brainStates']
+        for b in bs:
+            states.append(int(b))
+    att_count = 0
+    inatt_count = 0
+    total = 0
+    for s in states:
+        if (int)(s) == 0:
+            inatt_count += 1
+        else:
+            att_count +=1 
+        total += 1
+    
+        
+    return jsonify({"attentive" : (att_count/total)*100, "inattentive" : (inatt_count/total)*100})
     
 if __name__ == "__main__":
     app.run(debug=True, threaded=True)
