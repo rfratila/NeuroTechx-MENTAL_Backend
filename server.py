@@ -35,7 +35,7 @@ def start():
     else:
         attentive_state = ""
 
-    dummy = "-p /dev/tty.usbserial-DB00J8RE --add abhi person " + person_name + " recording_session_number 1 " +attentive_state + " duration " + "60"
+    dummy = "-p /dev/tty.usbserial-DB00J8RE --add abhi person " + person_name + " recording_session_number 1 " +attentive_state + " duration " + "15"
     # duration = 60 seconds 
 
     # dummy = "-p /dev/tty.usbserial-DB00J8RE --add abhi person Jake window_size 1 recording_session_number 12 attentive"
@@ -56,6 +56,11 @@ def start():
     '''
     # rc = p.poll()
     return "Initializing"
+
+@app.route('/triggerTraining')
+def triggerTraining():
+    call(["python","DeepEEG.py"])
+    return "Done running"
 
 @app.route('/startFocus', methods=['POST'])
 def startFocus():
