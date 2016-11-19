@@ -22,6 +22,7 @@ def hello():
 def login():
     temp = request.get_json()
     # TODO: create a file 
+    global person_name 
     person_name = temp['name']
     return jsonify({"name" : person_name})
 
@@ -29,7 +30,7 @@ def login():
 def start():
     temp = request.get_json()
     attentive_state = temp['attentive']
-    # attentive_state will be true / false 
+    # attentive_state will be true / false / focus
     
     if attentive_state is "true":
         attentive_state = "attentive"
@@ -41,8 +42,9 @@ def start():
         fileName = os.join(fileName,'attentive/%s'person_name)
     elif "false" in attentive_state
     import pudb; pu.db
-    dummy = "-p /dev/tty.usbserial-DB00J8RE --add abhi person " + person_name + " recording_session_number 1 " +attentive_state + " duration " + "60"
 
+    global person_name
+    dummy = "-p /dev/tty.usbserial-DB00J8RE --add abhi person " + person_name + " recording_session_number 1 " +attentive_state + " duration " + "15"
     # duration = 60 seconds 
 
     # dummy = "-p /dev/tty.usbserial-DB00J8RE --add abhi person Jake window_size 1 recording_session_number 12 attentive"
@@ -69,11 +71,6 @@ def triggerTraining():
     call(["python","DeepEEG.py"])
     return "Done running"
 
-@app.route('/startFocus', methods=['POST'])
-def startFocus():
-    # TODO: will be used for the actual focus session
-    return ""
-
 @app.route('/endFocus')
 def endFocus():
     return ""
@@ -91,7 +88,7 @@ def data():
 
 @app.route('/lineGraphData')
 def lineGraphData():
-    temp = { "data": [{ "label": "apples", "data": [12, 19, 3, 17, 6, 3, 7], "backgroundColor": "rgba(153,255,51,0.4)" }, { "label": "oranges", "data": [2, 29, 5, 5, 2, 3, 10], "backgroundColor": "rgba(400,153,0,0.4)" }, { "label": "banana", "data": [12, 19, 3, 17, 6, 3, 7], "backgroundColor": "rgba(153,255,51,0.4)" }, { "label": "pineapple", "data": [12, 19, 3, 17, 6, 3, 7], "backgroundColor": "rgba(500,255,51,0.4)" }, { "label": "hello", "data": [12, 19, 3, 17, 6, 3, 7], "backgroundColor": "rgba(153,255,51,0.4)" }] }
+    temp = { "data": [{ "label": "apples", "data": [12, 19, 3, 17, 6, 3, 7,1,1,1], "backgroundColor": "rgba(153,255,51,0.4)" }, { "label": "oranges", "data": [2, 29, 5, 5, 2, 3, 10,2,2,2], "backgroundColor": "rgba(400,153,0,0.4)" }, { "label": "banana", "data": [12, 19, 3, 17, 6, 3, 7,3,3,3], "backgroundColor": "rgba(153,255,51,0.4)" }, { "label": "pineapple", "data": [12, 19, 3, 17, 6, 3, 7,4,4,4], "backgroundColor": "rgba(500,255,51,0.4)" }, { "label": "hello", "data": [12, 19, 3, 17, 6, 3, 7,5,5,5], "backgroundColor": "rgba(153,255,51,0.4)" }] }
     return jsonify(temp)
 
 @app.route('/punchCard')
@@ -114,6 +111,7 @@ def testjson():
 @app.route('/registerPerson', methods=['POST'])
 def registerPerson():
     temp = request.get_json()
+    global person_name 
     person_name = temp['name']
     time_interval = temp['time_interval']
     return jsonify({"name" : person_name, "time_interval" : time_interval})
@@ -126,16 +124,8 @@ def callEEG():
 
 @app.route('/readFile')
 def test():
-    readFile()
-    return "done"
-
-@app.route('/pieChart')
-def pieChart():
-    # return percentage of attentive and inattentive
-    return jsonify({"attentive" : 10, "inattentive" : 90})
-
-def readFile():
     history = []
+    global person_name
     with open("./data/"+person_name+"/History.txt") as f:
         for line in f:
             lst = line.split("|")
@@ -143,8 +133,15 @@ def readFile():
             time_interval = lst[1]
             brainStates = list(lst[2])
             history.append({"timestamp" : timestamp, "time_interval" : time_interval, "brainStates" : brainStates[:-1]})
-    with open("./data/"+person_name+".json",'w') as outfile:
+    with open("./data/"+ person_name+".json",'w') as outfile:
         json.dump({"result":history}, outfile)
+    return "done"
+
+@app.route('/pieChart')
+def pieChart():
+    # return percentage of attentive and inattentive
+    return jsonify({"attentive" : 10, "inattentive" : 90})
+
     
 if __name__ == "__main__":
     app.run(debug=True, threaded=True)
