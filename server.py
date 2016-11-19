@@ -28,7 +28,7 @@ def login():
 def start():
     temp = request.get_json()
     attentive_state = temp['attentive']
-    # attentive_state will be true / false 
+    # attentive_state will be true / false / focus
     
     if attentive_state is "true":
         attentive_state = "attentive"
@@ -84,7 +84,7 @@ def data():
 
 @app.route('/lineGraphData')
 def lineGraphData():
-    temp = { "data": [{ "label": "apples", "data": [12, 19, 3, 17, 6, 3, 7], "backgroundColor": "rgba(153,255,51,0.4)" }, { "label": "oranges", "data": [2, 29, 5, 5, 2, 3, 10], "backgroundColor": "rgba(400,153,0,0.4)" }, { "label": "banana", "data": [12, 19, 3, 17, 6, 3, 7], "backgroundColor": "rgba(153,255,51,0.4)" }, { "label": "pineapple", "data": [12, 19, 3, 17, 6, 3, 7], "backgroundColor": "rgba(500,255,51,0.4)" }, { "label": "hello", "data": [12, 19, 3, 17, 6, 3, 7], "backgroundColor": "rgba(153,255,51,0.4)" }] }
+    temp = { "data": [{ "label": "apples", "data": [12, 19, 3, 17, 6, 3, 7,1,1,1], "backgroundColor": "rgba(153,255,51,0.4)" }, { "label": "oranges", "data": [2, 29, 5, 5, 2, 3, 10,2,2,2], "backgroundColor": "rgba(400,153,0,0.4)" }, { "label": "banana", "data": [12, 19, 3, 17, 6, 3, 7,3,3,3], "backgroundColor": "rgba(153,255,51,0.4)" }, { "label": "pineapple", "data": [12, 19, 3, 17, 6, 3, 7,4,4,4], "backgroundColor": "rgba(500,255,51,0.4)" }, { "label": "hello", "data": [12, 19, 3, 17, 6, 3, 7,5,5,5], "backgroundColor": "rgba(153,255,51,0.4)" }] }
     return jsonify(temp)
 
 @app.route('/punchCard')
