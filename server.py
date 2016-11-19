@@ -55,7 +55,7 @@ def start(sub_sample_duration=0):
 
     global person_name
     #dummy = "-p /dev/tty.usbserial-DB00J8RE --add abhi person " + person_name +attentive_state + " duration " + duration_value
-    dummy = "-p /dev/ttyUSB0 --add abhi person " + person_name +" " + attentive_state + " duration " + duration_value
+    dummy = "-p /dev/ttyUSB0 --add abhi person " + person_name + " duration " + duration_value + " " +attentive_state
 
    
     # dummy = "-p /dev/tty.usbserial-DB00J8RE --add abhi person Jake window_size 1 recording_session_number 12 attentive"
