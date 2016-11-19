@@ -3,7 +3,7 @@ from flask_cors import CORS
 # from graphing import *
 from pprint import pprint
 # from bci_workshop_tools import *
-from DeepEEG import getState
+# from DeepEEG import getState
 from subprocess import Popen, PIPE, STDOUT, call, check_call
 import json, time, sys
 # import user
@@ -42,18 +42,18 @@ def start(sub_sample_duration=0):
     elif attentive_state is "false":
         attentive_state = ""
 
-    fileName = 'data/'
-    if "true" in attentive_state:
-        fileName = os.join(fileName,'attentive/%s'%person_name)
-    elif "false" in attentive_state:
-        fileName = os.join(fileName,'inattentive/%s'%person_name)
-    elif "focus" in attentive_state:
-        fileName = os.join(fileName,'%s/'%person_name)
+    # fileName = 'data/'
+    # if "true" in attentive_state:
+    #     fileName = os.join(fileName,'attentive/%s'%person_name)
+    # elif "false" in attentive_state:
+    #     fileName = os.join(fileName,'inattentive/%s'%person_name)
+    # elif "focus" in attentive_state:
+    #     fileName = os.join(fileName,'%s/'%person_name)
     
     
 
     global person_name
-    dummy = "-p /dev/tty.usbserial-DB00J8RE --add abhi person " + person_name +attentive_state + " duration " + duration_value
+    dummy = "-p /dev/tty.usbserial-DB00J8RE --add abhi person " + person_name +" " +attentive_state + " duration " + duration_value
    
     # dummy = "-p /dev/tty.usbserial-DB00J8RE --add abhi person Jake window_size 1 recording_session_number 12 attentive"
     # args_list = dummy.split(" ")
